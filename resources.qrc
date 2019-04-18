@@ -1,0 +1,26 @@
+<RCC> 
+  <qresource prefix="/plugins/visualist"> 
+	<file>icons/excel.jpg</file>
+	<file>icons/load.png</file>
+    <file>icons/kde.png</file>
+	<file>icons/knn.png</file>
+	<file>icons/choropleth.png</file>
+    <file>icons/grid.png</file>
+	<file>icons/proportional.png</file>
+    <file>icons/relational.png</file>
+    <file>icons/graduated.png</file>
+    <file>icons/dynamic.png</file>
+    <file>icons/global.png</file>
+    <file>icons/localmoran.png</file>
+    <file>icons/localg.png</file>
+    <file>icons/localgstar.png</file>
+    <file>icons/lisa.png</file>
+    <file>icons/lsm.png</file>
+    <file>icons/localc.png</file>
+    <file>icons/rtm.png</file>
+    <file>icons/queen.png</file>
+    <file>icons/rook.png</file>
+    <file>icons/bishop.png</file>
+  </qresource> 
+</RCC> 
+
