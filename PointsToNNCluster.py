@@ -90,7 +90,7 @@ class PointsToNNCluster(QgisAlgorithm):
         return 'pointstonnclusters'
 
     def displayName(self):
-        return self.tr('Near Neighbor Clusters Map')
+        return self.tr('Nearest Neighbors Clusters Map')
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,

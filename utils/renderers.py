@@ -128,7 +128,7 @@ class MapRender(object):
 
     def choropleth2(self, cntField, labelField=None):
         labelField = cntField if labelField is None else labelField
-        fieldIndex = self.l.fieldNameIndex(cntField)
+        fieldIndex = self.l.fields().indexFromName(cntField)
         minimum = self.prov.minimumValue( fieldIndex )
         maximum = self.prov.maximumValue( fieldIndex )
         if str(minimum) == "NULL" or str(maximum) == "NULL":
@@ -162,7 +162,7 @@ class MapRender(object):
         return myRenderer
 
     def zscore(self, cntField):
-        fieldIndex = self.l.fieldNameIndex(cntField)
+        fieldIndex = self.l.fields().indexFromName(cntField)
         minimum = self.prov.minimumValue( fieldIndex )
         maximum = self.prov.maximumValue( fieldIndex )
         if not minimum < -2.576:
@@ -187,11 +187,8 @@ class MapRender(object):
             myMin = zstep[i]
             myMax = zstep[i+1]
             myLabel = "%.3f - %.3f" % (myMin,myMax)
-            mySymbol = QgsSymbol.defaultSymbol(QgsWkbTypes.MultiPolygon)
+            mySymbol = QgsSymbol.defaultSymbol(QgsWkbTypes.PolygonGeometry)
             mySymbol.setColor(colors[len(colors)-i-1])
-            l = mySymbol.symbolLayer(0)
-            l.setBorderColor(Qt.white)
-            mySymbol.setOpacity(0.7)
             myRange1 = QgsRendererRange(myMin,myMax,mySymbol,myLabel)
             myRangeList.append(myRange1)
         myRenderer = QgsGraduatedSymbolRenderer('', myRangeList)

@@ -67,10 +67,10 @@ class PointsToSplitLine(QgisAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterVectorLayer('linelayer', self.tr('Line Layer'), types=[QgsProcessing.TypeVectorLine], defaultValue=None))
-        self.addParameter(QgsProcessingParameterDistance('distancetoline', self.tr('Maximum Distance to the line'), parentParameterName='linelayer', defaultValue=100))
-        self.addParameter(QgsProcessingParameterVectorLayer('pointlayer', self.tr('Point Layer'), types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
         self.addParameter(QgsProcessingParameterDistance('segmentsize', self.tr('Size of the segments'), parentParameterName='linelayer', defaultValue=200))
-        self.addParameter(QgsProcessingParameterFeatureSink('LineMap', self.tr('Line Map'), type=QgsProcessing.TypeVectorLine, createByDefault=True, defaultValue=None))
+        self.addParameter(QgsProcessingParameterVectorLayer('pointlayer', self.tr('Point Layer'), types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
+        self.addParameter(QgsProcessingParameterDistance('distancetoline', self.tr('Maximum Distance to the line'), parentParameterName='linelayer', defaultValue=100))
+        self.addParameter(QgsProcessingParameterFeatureSink('LineMap', self.tr('Graduated Segmented Line Map'), type=QgsProcessing.TypeVectorLine, createByDefault=True, defaultValue=None))
 
     def name(self):
         return 'pointstosplitline'
@@ -127,6 +127,7 @@ class PointsToSplitLine(QgisAlgorithm):
             # output = processing.run('grass7:v.split', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
             # segmented_layer = QgsProcessingUtils.mapLayerFromString(output['output'], context=context)
             # outputs['segmentedLayer'] = segmented_layer
+
 
         feedback.setCurrentStep(1)
         if feedback.isCanceled():

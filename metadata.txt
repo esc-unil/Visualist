@@ -16,8 +16,8 @@ email=quentin.rossy@unil.ch
 
 about=Provide a brief description of the plugin and its purpose.
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/esc-unil/Visualist/issues
+repository=https://github.com/esc-unil/Visualist/
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=http://repo
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=http://homepage
+homepage=https://github.com/esc-unil/Visualist/issues
 category=Analysis
 icon=icon.png
 # experimental flag

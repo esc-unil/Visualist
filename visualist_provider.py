@@ -31,12 +31,13 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 __revision__ = '$Format:%H$'
 
 from qgis.core import QgsProcessingProvider
-from .ProportionalPoints import ProportionalPoints
+from .PointsToProportional import PointsToProportional
 from .PointsInPolygon import PointsInPolygon
 from .PointsInGrid import PointsInGrid
 from .PointsToLine import PointsToLine
 from .PointsToSplitLine import PointsToSplitLine
 from .PointsToNNCluster import PointsToNNCluster
+from .lisa import LocalIndicatorSpatialA
 # from .Heatmap import Heatmap
 from .loadSpreadsheet import LoadSpreadsheet
 from .loadMaps import LoadMaps
@@ -49,11 +50,12 @@ class VisualistProvider(QgsProcessingProvider):
         # Load algorithms
         self.alglist = [
                     PointsInPolygon(),
-                    ProportionalPoints(),
+                    PointsToProportional(),
                     PointsInGrid(),
                     PointsToLine(),
                     PointsToSplitLine(),
                     PointsToNNCluster(),
+                    LocalIndicatorSpatialA(),
                     # Heatmap(),
                     LoadSpreadsheet(),
                     LoadMaps()

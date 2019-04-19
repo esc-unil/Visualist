@@ -40,10 +40,7 @@ from qgis.core import (QgsApplication,
                 QgsProject,
                 QgsSettings,
                 )
-
 from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
-
-from .utils import SpreadsheetLayersDialog
 
 class LoadMaps(QgisAlgorithm):
     dest_id = None  # Save a reference to the output layer id
