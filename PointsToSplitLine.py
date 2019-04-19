@@ -41,6 +41,7 @@ from qgis.core import QgsProcessingParameterVectorLayer
 from qgis.core import QgsProcessingParameterFeatureSink
 from qgis.core import QgsProcessingUtils
 from qgis.core import QgsProcessingParameterDistance
+from qgis.core import QgsProcessingParameterField
 
 from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
 from tempfile import gettempdir
@@ -68,9 +69,21 @@ class PointsToSplitLine(QgisAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterVectorLayer('linelayer', self.tr('Line Layer'), types=[QgsProcessing.TypeVectorLine], defaultValue=None))
         self.addParameter(QgsProcessingParameterDistance('segmentsize', self.tr('Size of the segments'), parentParameterName='linelayer', defaultValue=200))
+        self.addParameter(QgsProcessingParameterField('LINES_ROAD_NAMES',
+                                                    self.tr('Names of roads in line layer'),
+                                                    type=QgsProcessingParameterField.String,
+                                                    parentLayerParameterName='linelayer',
+                                                    allowMultiple=False, defaultValue=None, optional=True))
         self.addParameter(QgsProcessingParameterVectorLayer('pointlayer', self.tr('Point Layer'), types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
-        self.addParameter(QgsProcessingParameterDistance('distancetoline', self.tr('Maximum Distance to the line'), parentParameterName='linelayer', defaultValue=100))
+        self.addParameter(QgsProcessingParameterDistance('distancetoline', self.tr('Maximum Distance to the line'), parentParameterName='pointlayer', defaultValue=100))
+        self.addParameter(QgsProcessingParameterField('POINTS_ROAD_NAMES',
+                                    self.tr('Names of roads in point layer'),
+                                    type=QgsProcessingParameterField.String,
+                                    parentLayerParameterName='pointlayer',
+                                    allowMultiple=False, defaultValue=None, optional=True))
         self.addParameter(QgsProcessingParameterFeatureSink('LineMap', self.tr('Graduated Segmented Line Map'), type=QgsProcessing.TypeVectorLine, createByDefault=True, defaultValue=None))
+        self.addParameter(QgsProcessingParameterFeatureSink('propMap',
+                                                    self.tr('Points linked to Line Map'), QgsProcessing.TypeVectorPoint))
 
     def name(self):
         return 'pointstosplitline'
@@ -138,10 +151,13 @@ class PointsToSplitLine(QgisAlgorithm):
             'DIST': parameters['distancetoline'],
             'FIELD': 'NUMPOINTS',
             'LINES': outputs['segmentedLayer'],
+            'LINES_ROAD_NAMES': parameters['LINES_ROAD_NAMES'],
             'POINTS': parameters['pointlayer'],
-            'OUTPUT': parameters['LineMap']
+            'POINTS_ROAD_NAMES': parameters['POINTS_ROAD_NAMES'],
+            'OUTPUT_LINE': parameters['LineMap'],
+            'OUTPUT_POINT': parameters['propMap']
         }
         feedback.pushInfo('Line: {}'.format(alg_params))
         outputs['GraduatedLinesMap'] = processing.run('visualist:pointstoline', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['LineMap'] = outputs['GraduatedLinesMap']['OUTPUT']
+        results['LineMap'] = outputs['GraduatedLinesMap']['OUTPUT_LINE']
         return results

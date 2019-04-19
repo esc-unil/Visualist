@@ -112,25 +112,23 @@ class PointsToLine(QgisAlgorithm):
                                             types=[QgsProcessing.TypeVectorLine],
                                             defaultValue=None))
 
-        # self.addParameter(QgsProcessingParameterFeatureSource(self.LINES,
-        #                                             self.tr('Lines'), [QgsProcessing.TypeVectorLine]))
+
+        self.addParameter(QgsProcessingParameterField(self.LINES_ROAD_NAMES,
+                                            self.tr('Names of roads in line layer'),
+                                            type=QgsProcessingParameterField.String,
+                                            parentLayerParameterName=self.LINES,
+                                            allowMultiple=False, defaultValue=None, optional=True))
+
         self.addParameter(QgsProcessingParameterVectorLayer(self.POINTS,
                                             self.tr('Point Layer'),
                                             types=[QgsProcessing.TypeVectorPoint],
                                             defaultValue=None))
 
-        # self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
-        #                                             self.tr('Points'), [QgsProcessing.TypeVectorPoint]))
-
-        self.addParameter(QgsProcessingParameterNumber(self.DIST,
+        self.addParameter(QgsProcessingParameterDistance(self.DIST,
                                                     self.tr('Maximum distance to the line'),
+                                                    parentParameterName=self.POINTS,
                                                     defaultValue=100))
 
-        self.addParameter(QgsProcessingParameterField(self.LINES_ROAD_NAMES,
-                                    self.tr('Names of roads in line layer'),
-                                    type=QgsProcessingParameterField.String,
-                                    parentLayerParameterName=self.LINES,
-                                    allowMultiple=False, defaultValue=None, optional=True))
 
         self.addParameter(QgsProcessingParameterField(self.POINTS_ROAD_NAMES,
                                     self.tr('Names of roads in point layer'),
@@ -199,6 +197,8 @@ class PointsToLine(QgisAlgorithm):
         field_rn_point = self.parameterAsString(parameters, self.POINTS_ROAD_NAMES, context)
         if field_rn_line:
             field_rn_line_index = line_source.fields().lookupField(field_rn_line)
+            if field_rn_point is None:
+                raise QgsProcessingException(self.invalidSourceError(parameters, self.POINTS_ROAD_NAMES))
         if field_rn_point:
             field_rn_point_index = point_source.fields().lookupField(field_rn_point)
             # raise QgsProcessingException(self.invalidSourceError(parameters, self.POINTS_ROAD_NAMES))
