@@ -151,13 +151,13 @@ class PointsToSplitLine(QgisAlgorithm):
             'DIST': parameters['distancetoline'],
             'FIELD': 'NUMPOINTS',
             'LINES': outputs['segmentedLayer'],
+            'STRING_MATCHING' : True,
             'LINES_ROAD_NAMES': parameters['LINES_ROAD_NAMES'],
             'POINTS': parameters['pointlayer'],
             'POINTS_ROAD_NAMES': parameters['POINTS_ROAD_NAMES'],
             'OUTPUT_LINE': parameters['LineMap'],
             'OUTPUT_POINT': parameters['propMap']
         }
-        feedback.pushInfo('Line: {}'.format(alg_params))
         outputs['GraduatedLinesMap'] = processing.run('visualist:pointstoline', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
         results['LineMap'] = outputs['GraduatedLinesMap']['OUTPUT_LINE']
         return results

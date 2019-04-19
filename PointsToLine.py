@@ -88,8 +88,8 @@ class PointsToLine(QgisAlgorithm):
     POINTS = 'POINTS'
     DIST = 'DIST'
     FIELD = 'FIELD'
-    POINTS_ROAD_NAMES = 'PROADS'
-    LINES_ROAD_NAMES = 'LROADS'
+    POINTS_ROAD_NAMES = 'POINTS_ROAD_NAMES'
+    LINES_ROAD_NAMES = 'LINES_ROAD_NAMES'
     OUTPUT_POINT = 'OUTPUT_POINT'
     OUTPUT_LINE = 'OUTPUT_LINE'
 
@@ -196,6 +196,7 @@ class PointsToLine(QgisAlgorithm):
         field_rn_line = self.parameterAsString(parameters, self.LINES_ROAD_NAMES, context)
         field_rn_point = self.parameterAsString(parameters, self.POINTS_ROAD_NAMES, context)
         if field_rn_line:
+            feedback.pushInfo('Calculation with Levenshtein matching between \'{}\' (lines) and \'{}\' (points)'.format(field_rn_line, field_rn_point))
             field_rn_line_index = line_source.fields().lookupField(field_rn_line)
             if field_rn_point is None:
                 raise QgsProcessingException(self.invalidSourceError(parameters, self.POINTS_ROAD_NAMES))

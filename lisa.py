@@ -154,10 +154,13 @@ class LocalIndicatorSpatialA(QgisAlgorithm):
 
         #Save in a temporary shp and laod with pysal
         temp_file = os.path.join(tempfile.gettempdir(), 'local_moran.shp')
-        QgsVectorFileWriter.writeAsVectorFormat(layer=poly_source,
+        writerError = QgsVectorFileWriter.writeAsVectorFormat(layer=poly_source,
                             fileName=temp_file,
-                            fileEncoding=sys.getfilesystemencoding())
-
+                            fileEncoding=sys.getfilesystemencoding(),
+                            destCRS = poly_source.crs(),
+                            driverName = "ESRI Shapefile")
+        if writerError[0] != 0:
+            feedback.pushInfo('Temp file writting error: {}'.format(writerError[1]))
         # Get data from field
         values = []
         features = poly_source.getFeatures()
@@ -166,7 +169,7 @@ class LocalIndicatorSpatialA(QgisAlgorithm):
             n_str = str(n)
             val = float(str(n)) if n_str != 'NULL' else 0
             values.append(val)
-        # feedback.pushInfo('values: {}'.format(sorted(values, reverse=True)))
+        feedback.pushInfo('Number of values of Y: {}'.format(len(values)))
         y = numpy.array(values)
 
         if proximity == 0: # queen
@@ -181,6 +184,11 @@ class LocalIndicatorSpatialA(QgisAlgorithm):
             w = pysal.lib.weights.distance.KNN.from_shapefile(temp_file, k=2)
         elif proximity == 4: # 2 for 3 NN
             w = pysal.lib.weights.distance.KNN.from_shapefile(temp_file, k=3)
+
+        feedback.pushInfo('W matrix size: {}'.format(w.sparse.shape))
+        if len(values) != w.sparse.shape[0]:
+            feedback.pushInfo('Dimension mismatch: unkown error!')
+            return False
         if self.lisa == 0:
             results = pysal.explore.esda.moran.Moran_Local(y, w)
             cotype = {1:'HH',2:'LH',3:'LL',4:'HL'}
