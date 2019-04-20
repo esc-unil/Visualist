@@ -9,7 +9,7 @@
 #-----------------------------------------------------------
 
 
-import os
+import os, math
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -59,13 +59,22 @@ class MapRender(object):
                 min = val
             elif val > max:
                 max = val
-
         if type == LINE:
-            strExp = "coalesce(0.26*scale_exp("+field+", "+str(min)+", "+str(max)+", 1, 10, 0.5), 0)"
+            strExp = "coalesce(0.5*scale_linear("+field+", "+str(min)+", "+str(max)+", 1, 10), 0)"
             prop = QgsProperty().fromExpression(strExp)
             symbol.setDataDefinedWidth(prop)
         else:
-            strExp = "coalesce(2*scale_exp("+field+", "+str(min)+", "+str(max)+", 1, 10, 0.5), 0)"
+            if min == 0:
+                minScale = 0
+                maxScale = 20
+            else:
+                maxScale = 20.0
+                minScale = (maxScale*math.sqrt(min))/math.sqrt(max)
+                if minScale < 1:
+                    minScale = 1
+                    maxScale = math.sqrt(max)/math.sqrt(min)
+            # strExp = "coalesce(scale_linear(sqrt("+field+"), "+str(math.sqrt(min))+", "+str(math.sqrt(max))+", "+str(minScale)+", "+str(maxScale)+"), 0)"
+            strExp = "coalesce(scale_exp("+field+", "+str(min)+", "+str(max)+", "+str(minScale)+", "+str(maxScale)+", 0.5), 0)"
             prop = QgsProperty().fromExpression(strExp)
             symbol.setDataDefinedSize(prop)
         # prop.setField(field)
@@ -81,7 +90,7 @@ class MapRender(object):
         # if type == POINT:
         #     l = s.symbolLayer(0)
         #     l.setColor(Qt.white)
-            #myRenderer.setScaleMethod(QgsSymbol.ScaleArea) #QgsSymbol.ScaleArea
+        # myRenderer.setScaleMethod(QgsSymbol.ScaleArea) #QgsSymbol.ScaleArea
         self.l.setRenderer(myRenderer)
         self.setLabels(labelField)
         return myRenderer

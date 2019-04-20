@@ -107,7 +107,7 @@ class PointsToLine(QgisAlgorithm):
         super().__init__()
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterVectorLayer(self.LINES,
+        self.addParameter(QgsProcessingParameterFeatureSource(self.LINES,
                                             self.tr('Line Layer'),
                                             types=[QgsProcessing.TypeVectorLine],
                                             defaultValue=None))
@@ -119,7 +119,7 @@ class PointsToLine(QgisAlgorithm):
                                             parentLayerParameterName=self.LINES,
                                             allowMultiple=False, defaultValue=None, optional=True))
 
-        self.addParameter(QgsProcessingParameterVectorLayer(self.POINTS,
+        self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
                                             self.tr('Point Layer'),
                                             types=[QgsProcessing.TypeVectorPoint],
                                             defaultValue=None))
@@ -184,11 +184,11 @@ class PointsToLine(QgisAlgorithm):
         return n
 
     def processAlgorithm(self, parameters, context, feedback):
-        line_source = self.parameterAsVectorLayer(parameters, self.LINES, context)
+        line_source = self.parameterAsSource(parameters, self.LINES, context)
         if line_source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.LINES))
 
-        point_source = self.parameterAsVectorLayer(parameters, self.POINTS, context)
+        point_source = self.parameterAsSource(parameters, self.POINTS, context)
         if point_source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.POINTS))
 
@@ -210,7 +210,7 @@ class PointsToLine(QgisAlgorithm):
         fields = line_source.fields()
         fields.append(QgsField(field_name, QVariant.LongLong))
         field_count_index = fields.lookupField(field_name)
-        if line_source.dataProvider().fieldNameIndex('fid') == -1:
+        if fields.lookupField('fid') < 0:
             fields.append(QgsField('fid', QVariant.Int))
         field_id_index = fields.lookupField('fid')
 
@@ -387,6 +387,10 @@ class PointsToLine(QgisAlgorithm):
                 prop_point_source.changeAttributeValue(point_feature.id(), field_point_lid_index, minFeatId)
             feedback.setProgress(int(current * total))
         prop_point_source.commitChanges()
+        if len(segList) == 0:
+            feedback.reportError(self.tr('No match between points and lines layers'), fatalError=True)
+            return {}
+
         feedback.setProgressText(self.tr('Create the layer'))
         total = 100.0 / len(segList)
         current = 0

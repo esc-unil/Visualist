@@ -130,6 +130,7 @@ class PointsToProportional(QgisAlgorithm):
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
 
+        maximumValue = 0
         if poly_source is None:
             features = point_source.getFeatures()
             total = 100.0 / point_source.featureCount() if point_source.featureCount() else 0

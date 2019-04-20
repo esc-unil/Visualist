@@ -37,7 +37,7 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsProcessing
 from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterNumber
-from qgis.core import QgsProcessingParameterVectorLayer
+from qgis.core import QgsProcessingParameterFeatureSource
 from qgis.core import QgsProcessingParameterFeatureSink
 from qgis.core import QgsProcessingUtils
 from qgis.core import QgsProcessingParameterDistance
@@ -67,14 +67,14 @@ class PointsToSplitLine(QgisAlgorithm):
         super().__init__()
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterVectorLayer('linelayer', self.tr('Line Layer'), types=[QgsProcessing.TypeVectorLine], defaultValue=None))
+        self.addParameter(QgsProcessingParameterFeatureSource('linelayer', self.tr('Line Layer'), types=[QgsProcessing.TypeVectorLine], defaultValue=None))
         self.addParameter(QgsProcessingParameterDistance('segmentsize', self.tr('Size of the segments'), parentParameterName='linelayer', defaultValue=200))
         self.addParameter(QgsProcessingParameterField('LINES_ROAD_NAMES',
                                                     self.tr('Names of roads in line layer'),
                                                     type=QgsProcessingParameterField.String,
                                                     parentLayerParameterName='linelayer',
                                                     allowMultiple=False, defaultValue=None, optional=True))
-        self.addParameter(QgsProcessingParameterVectorLayer('pointlayer', self.tr('Point Layer'), types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
+        self.addParameter(QgsProcessingParameterFeatureSource('pointlayer', self.tr('Point Layer'), types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
         self.addParameter(QgsProcessingParameterDistance('distancetoline', self.tr('Maximum Distance to the line'), parentParameterName='pointlayer', defaultValue=100))
         self.addParameter(QgsProcessingParameterField('POINTS_ROAD_NAMES',
                                     self.tr('Names of roads in point layer'),
