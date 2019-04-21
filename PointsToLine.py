@@ -224,6 +224,8 @@ class PointsToLine(QgisAlgorithm):
         if field_rn_point:
             fields_point.append(QgsField(field_rn_point, QVariant.String))
             field_point_rname_index = fields_point.lookupField(field_rn_point)
+            fields_point.append(QgsField(field_rn_point+"_levenshtein", QVariant.String))
+            field_point_rname_clean_index = fields_point.lookupField(field_rn_point+"_levenshtein")
 
         (self.sink, self.dest_id) = self.parameterAsSink(parameters, self.OUTPUT_LINE, context,
                                                fields, line_source.wkbType(), line_source.sourceCrs(), QgsFeatureSink.RegeneratePrimaryKey)
@@ -265,6 +267,7 @@ class PointsToLine(QgisAlgorithm):
             attrs = [i, None, len(points[key][1])]
             if field_rn_point:
                 attrs.append(points[key][2])
+                attrs.append(self.NameClean(points[key][2], feedback))
             output_feature.setAttributes(attrs)
             self.sink_point.addFeature(output_feature, QgsFeatureSink.FastInsert)
             feedback.setProgress(int(current * total))

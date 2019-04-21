@@ -31,6 +31,7 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 __revision__ = '$Format:%H$'
 
 from qgis.core import QgsProcessingProvider
+from qgis.PyQt.QtGui import QIcon
 from .PointsToProportional import PointsToProportional
 from .PointsInPolygon import PointsInPolygon
 from .PointsInGrid import PointsInGrid
@@ -38,6 +39,7 @@ from .PointsToLine import PointsToLine
 from .PointsToSplitLine import PointsToSplitLine
 from .PointsToNNCluster import PointsToNNCluster
 from .lisa import LocalIndicatorSpatialA
+from .NearestNeighbourAnalysis import NearestNeighbourAnalysis
 # from .Heatmap import Heatmap
 from .loadSpreadsheet import LoadSpreadsheet
 from .loadMaps import LoadMaps
@@ -58,8 +60,11 @@ class VisualistProvider(QgsProcessingProvider):
                     LocalIndicatorSpatialA(),
                     # Heatmap(),
                     LoadSpreadsheet(),
-                    LoadMaps()
+                    LoadMaps(),
+                    NearestNeighbourAnalysis()
                     ]
+
+        
 
     def unload(self):
         """
@@ -67,6 +72,10 @@ class VisualistProvider(QgsProcessingProvider):
         should be implemented here.
         """
         pass
+
+    def icon(self):
+        iconName = 'visualist.png'
+        return QIcon(":/plugins/visualist/icons/" + iconName)
 
     def loadAlgorithms(self):
         """

@@ -1,3 +1,6 @@
+@echo on
+pylupdate5 -noobsolete i18n\visualist.pro
+
 @echo off
 call "C:\Program Files\QGIS 3.4\bin\o4w_env.bat"
 call "C:\Program Files\QGIS 3.4\bin\qt5_env.bat"

@@ -34,7 +34,8 @@ import os
 import sys
 import inspect
 
-from qgis.core import QgsProcessingAlgorithm, QgsApplication
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from qgis.core import QgsProcessingAlgorithm, QgsApplication, QgsMessageLog
 from .visualist_provider import VisualistProvider
 from . import resources
 
@@ -45,10 +46,35 @@ if cmd_folder not in sys.path:
 
         # for alg in QgsApplication.processingRegistry().algorithms():
         #     feedback.pushInfo("{}:{} --> {}".format(alg.provider().name(), alg.name(), alg.displayName()))
+
+#Convenient function to debug
+NAME = "Visualist"
+log = lambda m: QgsMessageLog.logMessage(m, NAME)
+
 class VisualistPlugin(object):
 
     def __init__(self):
         self.provider = VisualistProvider()
+
+        # initialize plugin directory
+        self.plugin_dir = os.path.dirname(__file__)
+
+        # initialize locale
+        locale = QSettings().value('locale/userLocale')[0:2]
+        log('Locale: {}'.format(locale))
+        log('Plugin directory: {}'.format(self.plugin_dir))
+        locale_path = os.path.join(
+            self.plugin_dir,
+            'i18n',
+            'visualist_{}.qm'.format(locale))
+        log('Translation file: {}'.format(locale_path))
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+
+            if qVersion() > '4.3.3':
+                QCoreApplication.installTranslator(self.translator)
+                log('Translator added')
 
     def initGui(self):
         QgsApplication.processingRegistry().addProvider(self.provider)

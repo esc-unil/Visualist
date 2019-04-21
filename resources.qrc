@@ -1,5 +1,5 @@
-<RCC> 
-  <qresource prefix="/plugins/visualist"> 
+<RCC>
+  <qresource prefix="/plugins/visualist">
 	<file>icons/excel.jpg</file>
 	<file>icons/load.png</file>
     <file>icons/kde.png</file>
@@ -21,6 +21,6 @@
     <file>icons/queen.png</file>
     <file>icons/rook.png</file>
     <file>icons/bishop.png</file>
-  </qresource> 
-</RCC> 
-
+    <file>icons/visualist.png</file>
+  </qresource>
+</RCC>
