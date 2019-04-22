@@ -124,6 +124,7 @@ class PointsToNNCluster(QgisAlgorithm):
         point_source = self.parameterAsSource(parameters, self.POINTS, context)
         if point_source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.POINTS))
+
         self.layer = point_source
         self.index = QgsSpatialIndex()
         for feat in point_source.getFeatures():
@@ -131,6 +132,12 @@ class PointsToNNCluster(QgisAlgorithm):
 
         self.d = self.parameterAsDouble(parameters, self.DIST, context)
         self.thresh = self.parameterAsDouble(parameters, self.COUNT, context)
+
+        rand_dist = self.randDist(point_source)
+        feedback.pushDebugInfo(self.tr('Expected mean distance between points is: {}'.format(rand_dist)))
+        if self.d < rand_dist:
+            feedback.pushDebugInfo(self.tr('You should consider to increase the distance between points parameter'))
+
 
         fields = QgsFields()
         fields.append(QgsField("fid", QVariant.Int, "int", 9, 0))
@@ -244,10 +251,10 @@ class PointsToNNCluster(QgisAlgorithm):
     def pointDist(self, p1, p2):
         return math.sqrt(math.pow(p1.x()-p2.x(), 2)+math.pow(p1.y()-p2.y(), 2))
 
-    def randDist(self, layer):
-        ext = layer.extent()
+    def randDist(self, source):
+        ext = source.sourceExtent()
         A = ext.height()*ext.width()
-        n = layer.featureCount()
+        n = source.featureCount()
         return int(round(0.5*math.sqrt(A/n)))
 
     def __init__(self):

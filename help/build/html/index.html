@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Visualist: plugin for crime analysts &mdash; Visualist 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> Visualist
+          
+
+          
+            
+            <img src="_static/icon.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Visualist: plugin for crime analysts</a></li>
+<li><a class="reference internal" href="#aims">Aims</a></li>
+<li><a class="reference internal" href="#plugin-functionalities">Plugin functionalities</a></li>
+<li><a class="reference internal" href="#proportional-symbols-map">Proportional Symbols Map</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grid-map">Grid Map</a><ul>
+<li><a class="reference internal" href="#id1">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#choropleth-map">Choropleth Map</a><ul>
+<li><a class="reference internal" href="#id2">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#graduated-lines-map">Graduated Lines Map</a><ul>
+<li><a class="reference internal" href="#id3">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#graduated-segmented-lines-map">Graduated Segmented Lines Map</a><ul>
+<li><a class="reference internal" href="#id4">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nearest-neighbours-clusters-map">Nearest Neighbours Clusters Map</a><ul>
+<li><a class="reference internal" href="#explaination">Explaination</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#id7">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spatial-autocorrelation-map">Spatial Autocorrelation Map</a></li>
+<li><a class="reference internal" href="#k-nearest-neighours-analysis">K-Nearest Neighours analysis</a></li>
+<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Visualist</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Visualist: plugin for crime analysts</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="visualist-plugin-for-crime-analysts">
+<h1>Visualist: plugin for crime analysts<a class="headerlink" href="#visualist-plugin-for-crime-analysts" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="aims">
+<span id="index-0"></span><h1>Aims<a class="headerlink" href="#aims" title="Permalink to this headline">¶</a></h1>
+<p>The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks,
+without the need for additional software, libraries, or complex workarounds.</p>
+<p>If you would like to report a bug, make suggestions for improving visualist, or have a question about
+the tools, please use: <a class="reference external" href="https://github.com/esc-unil/Visualist/issues">https://github.com/esc-unil/Visualist/issues</a></p>
+</div>
+<div class="section" id="plugin-functionalities">
+<span id="index-1"></span><h1>Plugin functionalities<a class="headerlink" href="#plugin-functionalities" title="Permalink to this headline">¶</a></h1>
+<p>Visualist provides a growing suite of spatial data management and analysis functions that are
+both quick and (I hope) functional.</p>
+<p class="rubric">Cartography</p>
+<ul class="simple">
+<li><p>Proportional Symbols Map</p></li>
+<li><p>Grid Map</p></li>
+<li><p>Choropleth Map</p></li>
+<li><p>Graduated Lines Map</p></li>
+<li><p>Graduated Segmented Lines Map</p></li>
+<li><p>Nearest Neighbours Clusters Map</p></li>
+<li><p>Spatial Autocorrelation Map (LISA analysis)</p></li>
+</ul>
+<p class="rubric">Spatial statistics</p>
+<ul class="simple">
+<li><p>K-Nearest Neighours analysis</p></li>
+</ul>
+<p class="rubric">Utils</p>
+<ul class="simple">
+<li><p>Load data from a spreadsheet</p></li>
+<li><p>Load layers from a folder</p></li>
+</ul>
+</div>
+<div class="section" id="proportional-symbols-map">
+<h1>Proportional Symbols Map<a class="headerlink" href="#proportional-symbols-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/ProportionalMap2.png"><img alt="_images/ProportionalMap2.png" src="_images/ProportionalMap2.png" style="width: 99%;" /></a>
+<p>Proportional symbol maps group all points with the same position together at a single point.
+A circle whose size is proportional to the number of events is then created.</p>
+<p>The points can also be grouped with a polygon layer to represent all cases within each area as a single agregate.</p>
+<a class="reference internal image-reference" href="_images/ProportionalMapUngrouped2.png"><img alt="_images/ProportionalMapUngrouped2.png" src="_images/ProportionalMapUngrouped2.png" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="_images/ProportionalMapGrouped2.png"><img alt="_images/ProportionalMapGrouped2.png" src="_images/ProportionalMapGrouped2.png" style="width: 49%;" /></a>
+<p><cite>Examples of maps with proportional symbols: on the right with a grouping of points with the administrative layer of districts.</cite></p>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p><strong>Points</strong></p>
+<blockquote>
+<div><p>The input points layer.</p>
+</div></blockquote>
+<p><strong>Polygons [optional]</strong></p>
+<blockquote>
+<div><p>The optional polygon layer to agregate points and use the centroïd of areas.</p>
+</div></blockquote>
+<p><strong>Count field name</strong></p>
+<blockquote>
+<div><p>Name of the field created in the output layer</p>
+</div></blockquote>
+<p><strong>Output</strong></p>
+<blockquote>
+<div><p>A new point layer if a polygon layer is not defined, or a copy of the polygon layer with the a new count field.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="grid-map">
+<h1>Grid Map<a class="headerlink" href="#grid-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/GridMap2.png"><img alt="_images/GridMap2.png" src="_images/GridMap2.png" style="width: 99%;" /></a>
+<p>The grid map divide the area into squares and represent the number of events present in each cell.</p>
+<p>The operation is quite simple.
+The program creates a layer of polygons (squares) whose size can be configured.
+Then the number of events present in each square is counted.</p>
+<p>The choice of the grid size can be guided by the <strong>average distance expected if the points were randomly distributed</strong>:</p>
+<p><cite>d = 0.5 * Square root of A/n where A = area and n = number of events</cite></p>
+<div class="section" id="id1">
+<h2>Configuration<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p><strong>Points</strong></p>
+<blockquote>
+<div><p>The input points layer.</p>
+</div></blockquote>
+<p><strong>Grid extent</strong></p>
+<blockquote>
+<div><p>Extent parameter to define the area of the grid (the extent of the canvas, the layer or a selection)</p>
+</div></blockquote>
+<p><strong>Size of the grid</strong></p>
+<blockquote>
+<div><p>Distance parameter to define the size of each cell (in the unit of the points layer).</p>
+</div></blockquote>
+<p><strong>Count field name</strong></p>
+<blockquote>
+<div><p>Name of the field created in the output layer</p>
+</div></blockquote>
+<p><strong>Output</strong></p>
+<blockquote>
+<div><p>A new polygon layer with a count field.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="choropleth-map">
+<h1>Choropleth Map<a class="headerlink" href="#choropleth-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/ChoroplethMap2.png"><img alt="_images/ChoroplethMap2.png" src="_images/ChoroplethMap2.png" style="width: 99%;" /></a>
+<p>Choropleth maps represent a quantity (number of events, percentages, etc.) by color (or pattern) for administrative areas.
+They allow values to be compared by region and demographic information to be used to weight measurements.</p>
+<table class="colwidths-given docutils align-center">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>History</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="_images/GuerryMaps.jpg"><img alt="guerry" src="_images/GuerryMaps.jpg" style="width: 99%;" /></a></p></td>
+<td><dl class="simple">
+<dt><strong>André-Michel Guerry</strong></dt><dd><p>Essai sur la statistique morale de la France.
+Paris, Crochard,‎ 1833.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This type of map is relevant for a comparison by administrative region and
+allows the number of events to be weighted against, for example,
+the number of inhabitants, dwellings, businesses.</p>
+<p>The operation is relatively simple. From a layer of polygons (administrative regions),
+the number of events (from a layer of points) contained in each zone is calculated.
+A new polygon layer containing a column storing the values is created.</p>
+<p>Be careful, these maps generate the perception that the distribution of events is uniform in each area.</p>
+<div class="section" id="id2">
+<h2>Configuration<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p><strong>Polygons</strong></p>
+<blockquote>
+<div><p>The polygon layer to agregate points.</p>
+</div></blockquote>
+<p><strong>Points</strong></p>
+<blockquote>
+<div><p>The input points layer.</p>
+</div></blockquote>
+<p><strong>Weight field [optional]</strong></p>
+<blockquote>
+<div><p>A numeric field to weight the values (e.g. number of inhabitants or dwellings).</p>
+</div></blockquote>
+<p><strong>Multiplier [optional]</strong></p>
+<blockquote>
+<div><p>A numeric value for wheighting (default value si %)</p>
+</div></blockquote>
+<p><strong>Count field name</strong></p>
+<blockquote>
+<div><p>Name of the field created in the output layer</p>
+</div></blockquote>
+<p><strong>Output</strong></p>
+<blockquote>
+<div><p>A new polygon layer with a count field.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="graduated-lines-map">
+<h1>Graduated Lines Map<a class="headerlink" href="#graduated-lines-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/GraduatedLineWithoutSegmentation2.png"><img alt="_images/GraduatedLineWithoutSegmentation2.png" src="_images/GraduatedLineWithoutSegmentation2.png" style="width: 99%;" /></a>
+<p>Graduated line maps represent the number of events along roads (polyline layer).
+Events are projected onto the segments closest to their positions,
+but only if the distance between them is less than a configurable threshold (e. g. 50 meters).</p>
+<div class="section" id="id3">
+<h2>Configuration<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p><strong>Lines</strong></p>
+<blockquote>
+<div><p>The input lines layer to agregate points.</p>
+</div></blockquote>
+<p><strong>Points</strong></p>
+<blockquote>
+<div><p>The input points layer.</p>
+</div></blockquote>
+<p><strong>Names of roads in lines / points layer [optional]</strong></p>
+<blockquote>
+<div><p>The string fields containing the names of roads to match (Levenshtein alg.)
+If they are not set, the closest line is used.</p>
+</div></blockquote>
+<p><strong>Maximum distance to the line</strong></p>
+<blockquote>
+<div><p>A distance parameter (in unit of the line layer) to avoid the projection of points too far from the lines.</p>
+</div></blockquote>
+<p><strong>Count field name</strong></p>
+<blockquote>
+<div><p>Name of the field created in the output layer</p>
+</div></blockquote>
+<p><strong>Outputs</strong></p>
+<blockquote>
+<div><p>A new line layer with a count field.</p>
+<p>A new proportional symbols layer with two class of points:
+points linked to a line (in green) and points not linked to a line (in red).</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="graduated-segmented-lines-map">
+<h1>Graduated Segmented Lines Map<a class="headerlink" href="#graduated-segmented-lines-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/GraduatedLineWithPoints2.png"><img alt="_images/GraduatedLineWithPoints2.png" src="_images/GraduatedLineWithPoints2.png" style="width: 99%;" /></a>
+<p>Graduated Segmented line maps represent the number of events along roads (polyline layer).
+The algorithm starts by dividing the roads into segments whose length can be configured.
+The segment closest to each point is then identified.
+Events are projected onto the segments closest to their positions,
+but only if the distance between them is less than a configurable threshold (e. g. 50 meters).</p>
+<div class="section" id="id4">
+<h2>Configuration<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p><strong>Lines</strong></p>
+<blockquote>
+<div><p>The input lines layer to agregate points.</p>
+</div></blockquote>
+<p><strong>Size of the segments</strong></p>
+<blockquote>
+<div><p>A distance parameter (in unit of the line layer) to split the lines in segments</p>
+</div></blockquote>
+<p><strong>Points</strong></p>
+<blockquote>
+<div><p>The input points layer.</p>
+</div></blockquote>
+<p><strong>Names of roads in lines / points layer [optional]</strong></p>
+<blockquote>
+<div><p>The string fields containing the names of roads to match (Levenshtein alg.)
+If they are not set, the closest line is used.</p>
+</div></blockquote>
+<p><strong>Maximum distance to the line</strong></p>
+<blockquote>
+<div><p>A distance parameter (in unit of the line layer) to avoid the projection of points too far from the lines.</p>
+</div></blockquote>
+<p><strong>Count field name</strong></p>
+<blockquote>
+<div><p>Name of the field created in the output layer</p>
+</div></blockquote>
+<p><strong>Outputs</strong></p>
+<blockquote>
+<div><p>A new line layer with a count field.</p>
+<p>A new proportional symbols layer with two class of points:
+points linked to a line (in green) and points not linked to a line (in red).</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="nearest-neighbours-clusters-map">
+<h1>Nearest Neighbours Clusters Map<a class="headerlink" href="#nearest-neighbours-clusters-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/NearNeighborsMap2.png"><img alt="_images/NearNeighborsMap2.png" src="_images/NearNeighborsMap2.png" style="width: 99%;" /></a>
+<p>The map shows the hotspots identified by the analysis of the closest neighbours. The algorithm developed to produce a map of close neighbours
+is a simplified version of Ned Levine’s algorithm <a class="reference internal" href="#ned2015" id="id5"><span>[ned2015]</span></a> in
+CrimeStat: <a class="reference external" href="http://nij.gov/topics/technology/maps/pages/crimestat.aspx">http://nij.gov/topics/technology/maps/pages/crimestat.aspx</a>.</p>
+<div class="section" id="explaination">
+<h2>Explaination<a class="headerlink" href="#explaination" title="Permalink to this headline">¶</a></h2>
+<p>The algorithm works like this:</p>
+<blockquote>
+<div><p>1. For each event, a square centred on the position of the event and
+with a size of twice the search distance is used to
+select close neighbours. The distances with these neighbours are
+calculated and events are considered as close neighbours of the event
+if the distance is less than or equal to the search distance.</p>
+<p>2. The event with the most neighbours is selected. They form the first hot spot.
+They are removed from the distribution and the following event with the highest number
+of neighbours is selected. They form the second hot-spot, etc.
+The algorithm is recursive until there is no more events with a number of neighbours greater than or equal to
+to the defined cluster size.</p>
+<p>3. For each cluster, the centre of gravity is calculated.
+The distances are recalculated with the gravity centres to ensure
+that the areas do not overlap. Indeed, some events may
+change groups if two hotspots are spatially close.</p>
+<p>4. The convex envelope of each cluster is used to
+represent the hot points by polygons.</p>
+</div></blockquote>
+<p>Unlike Ned Levine’s algorithm in CrimeStat (Nearest Neighbor Hierarchical Clustering) <a class="reference internal" href="#ned2015" id="id6"><span>[ned2015]</span></a>,
+the map represents only first-order clusters.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>The examples below show the advantages of using this
+method rather than a density map or grid map</p>
+<a class="reference internal image-reference" href="_images/NearNeighborsVSHeatmap.png"><img alt="_images/NearNeighborsVSHeatmap.png" src="_images/NearNeighborsVSHeatmap.png" style="width: 99%;" /></a>
+<p>Nearest Neighbours Clusters always contain events, unlike the heatmap
+(the worst method for crime analysis thus not include in the plugin).
+In addition, the quantities directly represent the number of events that occurred in each area.</p>
+<a class="reference internal image-reference" href="_images/NearNeighborsVSGrid.png"><img alt="_images/NearNeighborsVSGrid.png" src="_images/NearNeighborsVSGrid.png" style="width: 99%;" /></a>
+<p>Areas are defined directly by the distribution of the events, while on a grid map
+the agregation is defined by the size of the grid and the position of the total area.
+On a grid map, the origin of the grid changes the representation.</p>
+</div>
+<div class="section" id="id7">
+<h2>Configuration<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p><strong>Points</strong></p>
+<blockquote>
+<div><p>The input points layer.</p>
+</div></blockquote>
+<p><strong>Maximum distance between points</strong></p>
+<blockquote>
+<div><p>A distance parameter (in unit of the point layer) to define what is a close neighbour.</p>
+<p>The choice of the distance should be guided by the <strong>average distance expected if the points were randomly distributed</strong>:</p>
+<p><cite>d = 0.5 * Square root of A/n where A = area and n = number of events</cite></p>
+</div></blockquote>
+<p><strong>Minimum size of the clusters</strong></p>
+<blockquote>
+<div><p>A numeric parameter to define the size of the clusters (i.e. the minimum number of events to consider an area as a hotspot).</p>
+</div></blockquote>
+<p><strong>Count field name</strong></p>
+<blockquote>
+<div><p>Name of the field created in the output layer</p>
+</div></blockquote>
+<p><strong>Output</strong></p>
+<blockquote>
+<div><p>A new polygon layer with a count field.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="spatial-autocorrelation-map">
+<h1>Spatial Autocorrelation Map<a class="headerlink" href="#spatial-autocorrelation-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/LisaBase.png"><img alt="_images/LisaBase.png" src="_images/LisaBase.png" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="_images/LisaLocalGiStar.png"><img alt="_images/LisaLocalGiStar.png" src="_images/LisaLocalGiStar.png" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="_images/LisaLocalMoranI.png"><img alt="_images/LisaLocalMoranI.png" src="_images/LisaLocalMoranI.png" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="_images/LisaLocalMoranCotypes.png"><img alt="_images/LisaLocalMoranCotypes.png" src="_images/LisaLocalMoranCotypes.png" style="width: 49%;" /></a>
+<p>This maps are generated with PySAL: Python Spatial Analysis Library from Rey, S.J. and L. Anselin <a class="reference internal" href="#ran2010" id="id8"><span>[ran2010]</span></a></p>
+</div>
+<div class="section" id="k-nearest-neighours-analysis">
+<h1>K-Nearest Neighours analysis<a class="headerlink" href="#k-nearest-neighours-analysis" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/NearNeighborsAnalysis.png"><img alt="_images/NearNeighborsAnalysis.png" src="_images/NearNeighborsAnalysis.png" style="width: 99%;" /></a>
+</div>
+<div class="section" id="acknowledgements">
+<span id="index-2"></span><h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h1>
+<p>This 3.0 version was created with Plugin Builder</p>
+<p>It integrate:</p>
+<ul class="simple">
+<li><p>the plugin SpreadsheetLayers (C) 2014 by Camptocamp (<a class="reference external" href="https://github.com/camptocamp/QGIS-SpreadSheetLayers">https://github.com/camptocamp/QGIS-SpreadSheetLayers</a>)</p></li>
+<li><p>a light version of the pysal module for LISA analysis (<a class="reference external" href="https://pysal.readthedocs.io/en/latest/">https://pysal.readthedocs.io/en/latest/</a>)</p></li>
+<li><p>functionalities inspired from Victor Olaya processing plugins (<a class="reference external" href="https://github.com/volaya?tab=repositories">https://github.com/volaya?tab=repositories</a>)</p></li>
+<li><p>functionalities inspired from Crimestat made under the direction of Ned Levine (<a class="reference external" href="https://nij.gov/topics/technology/maps/pages/crimestat.aspx">https://nij.gov/topics/technology/maps/pages/crimestat.aspx</a>)</p></li>
+</ul>
+</div>
+<div class="section" id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
+<dl class="citation">
+<dt class="label" id="ned2015"><span class="brackets">ned2015</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>)</span></dt>
+<dd><p>LEVINE, Ned (2015). CrimeStat: A Spatial Statistics Program for the Analysis of Crime Incident Locations (v 4.02). Ned Levine &amp; Associates, Houston, Texas, and the National Institute of Justice, Washington, D.C. August.</p>
+</dd>
+<dt class="label" id="ran2010"><span class="brackets"><a class="fn-backref" href="#id8">ran2010</a></span></dt>
+<dd><p>REY, Sergio J. &amp; ANSELIN, Luc. (2010). PySAL: A Python library of spatial analytical methods. In : Handbook of applied spatial analysis. Springer, Berlin, Heidelberg, 2010. p. 175-193.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Quentin Rossy
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

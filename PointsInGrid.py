@@ -30,7 +30,7 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 
 __revision__ = '$Format:%H$'
 
-import os
+import os, math
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QVariant
@@ -93,7 +93,7 @@ class PointsInGrid(QgisAlgorithm):
 
         self.addParameter(QgsProcessingParameterExtent(self.EXTENT, self.tr('Grid extent')))
 
-        grid_size = QgsProcessingParameterNumber(self.GRID,self.tr('Size of the grid'))
+        grid_size = QgsProcessingParameterDistance(self.GRID,self.tr('Size of the grid'),parentParameterName=self.POINTS,defaultValue=100)
         self.addParameter(grid_size)
         # grid_size.setText(randDist(point_source))
 
@@ -107,10 +107,10 @@ class PointsInGrid(QgisAlgorithm):
         return self.tr('Grid Map')
 
 
-    def randDist(self, layer):
-        ext = layer.extent()
+    def randDist(self, source):
+        ext = source.sourceExtent()
         A = ext.height()*ext.width()
-        n = layer.featureCount()
+        n = source.featureCount()
         return int(round(0.5*math.sqrt(A/n)))
 
     def postProcessAlgorithm(self, context, feedback):
@@ -133,6 +133,11 @@ class PointsInGrid(QgisAlgorithm):
         if bbox.width() < grid_size or bbox.height() < grid_size:
             raise QgsProcessingException(
                 self.tr('Grid size is too large for the covered area'))
+
+        rand_dist = self.randDist(point_source)
+        feedback.pushDebugInfo(self.tr('Expected mean distance between points is: {}'.format(rand_dist)))
+        if grid_size < rand_dist:
+            feedback.pushDebugInfo(self.tr('You should consider to increase the size of the cell'))
 
         field_name = self.parameterAsString(parameters, self.FIELD, context)
         self.field_name = field_name
