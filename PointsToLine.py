@@ -31,6 +31,7 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 __revision__ = '$Format:%H$'
 
 import math, os
+import urllib.parse
 from tempfile import gettempdir
 
 from shapely.geometry import LineString, MultiPoint
@@ -69,7 +70,8 @@ from qgis.core import (QgsApplication,
                        QgsCoordinateTransform,
                        QgsVectorLayer,
                        QgsProject,
-                       QgsStringUtils)
+                       QgsStringUtils,
+                       QgsMessageLog)
 
 from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
 import processing
@@ -78,6 +80,10 @@ from .utils import renderers
 
 # SK: Librairies pour comparaison chaine de caracteres des rues
 import csv, re, unicodedata
+
+#Convenient function to debug
+NAME = "Visualist"
+log = lambda m: QgsMessageLog.logMessage(m, NAME)
 
 def count_iterable(i):
     return sum(1 for e in i)
@@ -105,6 +111,17 @@ class PointsToLine(QgisAlgorithm):
 
     def __init__(self):
         super().__init__()
+
+    def helpUrl(self):
+        url = os.path.join("file:///"+os.path.dirname(__file__).replace("\\","/"),"help/build/html/index.html")
+        log(url)
+        return url
+
+    def shortDescription(self):
+        help = """Graduated line maps represent the number of events along roads (polyline layer).
+            Events are projected onto the segments closest to their positions,
+            but only if the distance between them is less than a configurable threshold (e. g. 50 meters)."""
+        return help
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.LINES,

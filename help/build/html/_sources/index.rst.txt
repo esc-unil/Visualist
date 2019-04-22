@@ -282,8 +282,7 @@ Nearest Neighbours Clusters Map
 .. image:: images/NearNeighborsMap2.png
 	:width: 99%
 	
-The map shows the hotspots identified by the analysis of the closest neighbours. The algorithm developed to produce a map of close neighbours 
-is a simplified version of Ned Levine's algorithm [ned2015]_ in 
+The map shows the hotspots identified by the analysis of the closest neighbours. This algorithm is a simplified version of Ned Levine's algorithm [ned2015]_ in 
 CrimeStat: http://nij.gov/topics/technology/maps/pages/crimestat.aspx. 
 
 
@@ -376,7 +375,7 @@ Spatial Autocorrelation Map
 .. image:: images/LisaLocalMoranCotypes.png
 	:width: 49%
 
-This maps are generated with PySAL: Python Spatial Analysis Library from Rey, S.J. and L. Anselin [ran2010]_
+These maps are generated with PySAL: Python Spatial Analysis Library from Rey, S.J. and L. Anselin [ran2010]_
 
 K-Nearest Neighours analysis
 =============================

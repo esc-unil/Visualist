@@ -10,11 +10,11 @@
 name=Visualist
 qgisMinimumVersion=3.0
 description=Plugin for Crime Analysts
-version=0.1
+version=0.2
 author=Quentin Rossy
 email=quentin.rossy@unil.ch
 
-about=Provide a brief description of the plugin and its purpose.
+about=The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks, without the need for additional software, libraries, or complex workarounds.
 
 tracker=https://github.com/esc-unil/Visualist/issues
 repository=https://github.com/esc-unil/Visualist/
@@ -26,9 +26,9 @@ repository=https://github.com/esc-unil/Visualist/
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=python
+tags=Proportional Symbols Map,Grid Map,Choropleth Map,Graduated Lines Map,Graduated Segmented Lines Map,Nearest Neighbours Clusters Map,Spatial Autocorrelation Map,LISA analysis,K-Nearest Neighours analysis
 
-homepage=https://github.com/esc-unil/Visualist/issues
+homepage=https://analysecriminelle.org
 category=Analysis
 icon=icon.png
 # experimental flag
