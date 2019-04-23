@@ -17,7 +17,7 @@ Aims
 The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks,
 without the need for additional software, libraries, or complex workarounds.
 
-The functionalities from the qGis 2.0 version have been removed. 
+Some functionalities from the qGis 2.0 version have been removed. 
 The following plugins are recommended:
 
 **Spreadsheet Layer** (https://plugins.qgis.org/plugins/SpreadsheetLayers/)
