@@ -38,11 +38,8 @@ from .PointsInGrid import PointsInGrid
 from .PointsToLine import PointsToLine
 from .PointsToSplitLine import PointsToSplitLine
 from .PointsToNNCluster import PointsToNNCluster
-from .lisa import LocalIndicatorSpatialA
+from .Lisa import LocalIndicatorSpatialA
 from .NearestNeighbourAnalysis import NearestNeighbourAnalysis
-# from .Heatmap import Heatmap
-from .loadSpreadsheet import LoadSpreadsheet
-from .loadMaps import LoadMaps
 
 class VisualistProvider(QgsProcessingProvider):
 
@@ -58,13 +55,10 @@ class VisualistProvider(QgsProcessingProvider):
                     PointsToSplitLine(),
                     PointsToNNCluster(),
                     LocalIndicatorSpatialA(),
-                    # Heatmap(),
-                    LoadSpreadsheet(),
-                    LoadMaps(),
                     NearestNeighbourAnalysis()
                     ]
 
-        
+
 
     def unload(self):
         """

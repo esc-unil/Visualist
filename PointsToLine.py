@@ -83,12 +83,12 @@ class PointsToLine(VisualistAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.LINES,
-                                            self.tr('Line Layer'),
+                                            self.tr('Lines'),
                                             types=[QgsProcessing.TypeVectorLine],
                                             defaultValue=None))
 
         self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
-                                            self.tr('Point Layer'),
+                                            self.tr('Points'),
                                             types=[QgsProcessing.TypeVectorPoint],
                                             defaultValue=None))
 
@@ -98,7 +98,7 @@ class PointsToLine(VisualistAlgorithm):
                                                     defaultValue=100))
 
         lroad_fied = QgsProcessingParameterField(self.LINES_ROAD_NAMES,
-                                            self.tr('Names of roads in line layer'),
+                                            self.tr('Names of roads in lines'),
                                             type=QgsProcessingParameterField.String,
                                             parentLayerParameterName=self.LINES,
                                             allowMultiple=False, defaultValue=None, optional=True)
@@ -106,7 +106,7 @@ class PointsToLine(VisualistAlgorithm):
         self.addParameter(lroad_fied)
 
         proad_field = QgsProcessingParameterField(self.POINTS_ROAD_NAMES,
-                                    self.tr('Names of roads in point layer'),
+                                    self.tr('Names of roads in points'),
                                     type=QgsProcessingParameterField.String,
                                     parentLayerParameterName=self.POINTS,
                                     allowMultiple=False, defaultValue=None, optional=True)
@@ -142,15 +142,15 @@ class PointsToLine(VisualistAlgorithm):
     # SK: Pre-traitement pour distance de Levenshtein
     def NameClean(self, address, feedback):
         noise = re.compile("(?<![a-z])rue|av\.|avenue|(?<![a-z])bd(?![a-z])|boulevard|ch\.|chemin|(?<![a-z])rte|route|^q\.|quai|quartier|passage|(?<![a-z])voie|(?<![a-z])allee|rlle|(?<![a-z])[dl][aeu]s*(?![a-z])|bis|[0-9]+[a-z]|[0-9]+|d\'|l\'|(?<![a-z])[a-z]{1}(?![a-z])|cff")
-        n = ' '.join(str(address).split("/",2)[0].split())
+        i = 1 if len(str(address).split("/",2)[0]) == 0 else 0
+        n = ' '.join(str(address).split("/",2)[i].split())
         n = ' '.join(n.split())
         n = n.lower().replace('-',' ').replace('pl.','place').replace(',',' ').replace('"',' ')
-    #    n = unicodedata.normalize("NFD", unicode(n,"Utf-8")).encode("ascii", "ignore")
+        #    n = unicodedata.normalize("NFD", unicode(n,"Utf-8")).encode("ascii", "ignore")
         if type(n) is str: # test erreur certaines lignes non unicode depuis QGIS
             n = unicodedata.normalize("NFKD", n).encode("ascii", "ignore") #'ignore' : supprime le caractere s'il y a une erreur
         else:
             n = unicodedata.normalize("NFKD", str(n,"Utf-8")).encode("ascii", "ignore") #pour les chaines vides
-            # fix_print_with_import
             feedback.pushInfo('Non-unicode line: {}'.format(address))
         n = re.sub(noise, '', n.decode('ascii'), count=0, flags=0)
         n = ' '.join(sorted(n.split(), key=str.lower))
@@ -209,9 +209,6 @@ class PointsToLine(VisualistAlgorithm):
                                                fields_point, point_source.wkbType(), point_source.sourceCrs(), QgsFeatureSink.RegeneratePrimaryKey)
         if self.sink_point is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT_POINT))
-
-        # context.addLayerToLoadOnCompletion( self.OUTPUT_POINT,
-        #             QgsProcessingContext.LayerDetails(name = self.OUTPUT_POINT, project=context.project() ))
 
         #Calculate Proportional Symbol Map
         features = point_source.getFeatures()

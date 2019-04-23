@@ -47,7 +47,8 @@ from qgis.core import (
                 QgsFeature,
                 QgsFeatureRequest,
                 QgsProcessingUtils,
-                QgsProcessingParameterEnum
+                QgsProcessingParameterEnum,
+                QgsProcessingParameterNumber
                 )
 
 from .visualist_alg import VisualistAlgorithm
@@ -60,10 +61,11 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
     FIELD = 'FIELD'
     LISA = 'LISA'
     W = 'W'
+    DISTANCE = 'DISTANCE'
     OUTPUT = 'OUTPUT'
 
     LISA_TYPE = {0:'Moran\'s I',1:'Getis-Ord Gi*'}
-    W_TYPE = {0:'Queen', 1:'Rook', 2:'Bishop', 3:'2 Nearest neighbors', 4:'3 Nearest neighbors'}
+    W_TYPE = {0:'Queen', 1:'Rook', 2:'Bishop', 3:'Distance', 4:'Nearest neighbours'}
 
     def __init__(self):
         super().__init__()
@@ -76,7 +78,7 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
                                     self.tr('Polygons'), [QgsProcessing.TypeVectorPolygon]))
 
         self.addParameter(QgsProcessingParameterField(self.FIELD,
-                                    self.tr('Input numeric field'),
+                                    self.tr('Values'),
                                     type=QgsProcessingParameterField.Numeric,
                                     parentLayerParameterName=self.POLYGONS,
                                     allowMultiple=False, defaultValue=None))
@@ -85,15 +87,30 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
                                     self.tr('LISA Indicator'),
                                     self.LISA_TYPE.values(),
                                     allowMultiple=False, defaultValue=0))
+
         self.addParameter(QgsProcessingParameterEnum(self.W,
-                                    self.tr('Proximity type'),
+                                    self.tr('Spatial weights matrix'),
                                     self.W_TYPE.values(),
                                     allowMultiple=False, defaultValue=0))
+
+        self.addParameter(QgsProcessingParameterNumber(self.DISTANCE,
+                                    self.tr('Distance (in layer unit or number of neighbours)'),
+                                    type=QgsProcessingParameterNumber.Integer,
+                                    optional=True))
 
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT,
                                     self.tr('Spatial Autocorrelation Map'),
                                     QgsProcessing.TypeVectorPolygon))
 
+    def checkParameterValues(self, parameters, context):
+            distance = self.parameterAsInt(parameters, self.DISTANCE, context)
+            proximity = self.parameterAsEnum(parameters, self.W, context)
+            if distance <= 0:
+                if proximity == 3:
+                    return False, self.tr('Invalid distance')
+                elif proximity == 4:
+                    return False, self.tr('Invalid number of near neighbours')
+            return super(LocalIndicatorSpatialA, self).checkParameterValues(parameters, context)
 
     def postProcessAlgorithm(self, context, feedback):
         """
@@ -118,6 +135,8 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
 
         self.lisa = self.parameterAsEnum(parameters, self.LISA, context)
         proximity = self.parameterAsEnum(parameters, self.W, context)
+        distance = self.parameterAsInt(parameters, self.DISTANCE, context)
+
         #add fields for local Moran Results
         fields = poly_source.fields()
         fields.append(QgsField('MORANS_P' if self.lisa == 0 else 'GETISORD_P', QVariant.Double))
@@ -161,10 +180,10 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
             wq = pysal.lib.weights.contiguity.Queen.from_shapefile(temp_file)
             wr = pysal.lib.weights.contiguity.Rook.from_shapefile(temp_file)
             w = pysal.lib.weights.set_operations.w_difference(wq, wr,constrained = False)
-        elif proximity == 3: # 2 for 2 NN
-            w = pysal.lib.weights.distance.KNN.from_shapefile(temp_file, k=2)
-        elif proximity == 4: # 2 for 3 NN
-            w = pysal.lib.weights.distance.KNN.from_shapefile(temp_file, k=3)
+        elif proximity == 3: # 2 for distance bnd
+            w = pysal.lib.weights.distance.DistanceBand.from_shapefile(temp_file, threshold=distance)
+        elif proximity == 4: # 2 for NN
+            w = pysal.lib.weights.distance.KNN.from_shapefile(temp_file, k=distance)
 
         feedback.pushInfo('W matrix size: {}'.format(w.sparse.shape))
         if len(values) != w.sparse.shape[0]:

@@ -93,7 +93,7 @@ class NearestNeighbourAnalysis(VisualistAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.INPUT,
-                                                              self.tr('Input layer'), [QgsProcessing.TypeVectorPoint]))
+                                                              self.tr('Points'), [QgsProcessing.TypeVectorPoint]))
 
         self.addParameter(QgsProcessingParameterNumber(self.K,
                                             self.tr('Number of nearest neighbours (k)'),

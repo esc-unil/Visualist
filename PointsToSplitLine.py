@@ -64,7 +64,7 @@ class PointsToSplitLine(VisualistAlgorithm):
     def initAlgorithm(self, config=None):
 
         self.addParameter(QgsProcessingParameterFeatureSource(self.LINES,
-                                            self.tr('Line Layer'),
+                                            self.tr('Lines'),
                                             types=[QgsProcessing.TypeVectorLine],
                                             defaultValue=None))
         self.addParameter(QgsProcessingParameterDistance(self.SEGMENT_SIZE,

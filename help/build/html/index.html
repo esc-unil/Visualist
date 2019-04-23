@@ -116,8 +116,11 @@
 <li><a class="reference internal" href="#id7">Configuration</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#spatial-autocorrelation-map">Spatial Autocorrelation Map</a></li>
-<li><a class="reference internal" href="#k-nearest-neighours-analysis">K-Nearest Neighours analysis</a></li>
+<li><a class="reference internal" href="#spatial-autocorrelation-map">Spatial Autocorrelation Map</a><ul>
+<li><a class="reference internal" href="#id9">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#k-nearest-neighbours-analysis">K-Nearest Neighbours analysis</a></li>
 <li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -194,8 +197,17 @@
 <span id="index-0"></span><h1>Aims<a class="headerlink" href="#aims" title="Permalink to this headline">¶</a></h1>
 <p>The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks,
 without the need for additional software, libraries, or complex workarounds.</p>
-<p>If you would like to report a bug, make suggestions for improving visualist, or have a question about
-the tools, please use: <a class="reference external" href="https://github.com/esc-unil/Visualist/issues">https://github.com/esc-unil/Visualist/issues</a></p>
+<p>The functionalities from the qGis 2.0 version have been removed.
+The following plugins are recommended:</p>
+<p><strong>Spreadsheet Layer</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/SpreadsheetLayers/">https://plugins.qgis.org/plugins/SpreadsheetLayers/</a>)
+Load layers from spreadsheet files (*.ods, *.xls, *.xlsx)</p>
+<p><strong>Load Them All</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/loadthemall/">https://plugins.qgis.org/plugins/loadthemall/</a>)
+Loads files stored in a directory structure recursively, based on several filters</p>
+<p>or</p>
+<p><strong>Layers menu from project</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/menu_from_project/">https://plugins.qgis.org/plugins/menu_from_project/</a>)
+Allow easy opening of layers maintaining their styles</p>
+<p>If you would like to report a bug, make suggestions for improving Visualist,
+or have a question aboutthe tools, please use: <a class="reference external" href="https://github.com/esc-unil/Visualist/issues">https://github.com/esc-unil/Visualist/issues</a></p>
 </div>
 <div class="section" id="plugin-functionalities">
 <span id="index-1"></span><h1>Plugin functionalities<a class="headerlink" href="#plugin-functionalities" title="Permalink to this headline">¶</a></h1>
@@ -213,23 +225,20 @@ both quick and (I hope) functional.</p>
 </ul>
 <p class="rubric">Spatial statistics</p>
 <ul class="simple">
-<li><p>K-Nearest Neighours analysis</p></li>
-</ul>
-<p class="rubric">Utils</p>
-<ul class="simple">
-<li><p>Load data from a spreadsheet</p></li>
-<li><p>Load layers from a folder</p></li>
+<li><p>K-Nearest neighbours analysis</p></li>
 </ul>
 </div>
 <div class="section" id="proportional-symbols-map">
 <h1>Proportional Symbols Map<a class="headerlink" href="#proportional-symbols-map" title="Permalink to this headline">¶</a></h1>
 <a class="reference internal image-reference" href="_images/ProportionalMap2.png"><img alt="_images/ProportionalMap2.png" src="_images/ProportionalMap2.png" style="width: 99%;" /></a>
-<p>Proportional symbol maps group all points with the same position together at a single point.
+<p>Proportional symbol maps groups all points with the same position together at a single point.
 A circle whose size is proportional to the number of events is then created.</p>
-<p>The points can also be grouped with a polygon layer to represent all cases within each area as a single agregate.</p>
+<p>The points can also be grouped with a polygon layer to represent all cases
+within each area as a single aggregate.</p>
 <a class="reference internal image-reference" href="_images/ProportionalMapUngrouped2.png"><img alt="_images/ProportionalMapUngrouped2.png" src="_images/ProportionalMapUngrouped2.png" style="width: 49%;" /></a>
 <a class="reference internal image-reference" href="_images/ProportionalMapGrouped2.png"><img alt="_images/ProportionalMapGrouped2.png" src="_images/ProportionalMapGrouped2.png" style="width: 49%;" /></a>
-<p><cite>Examples of maps with proportional symbols: on the right with a grouping of points with the administrative layer of districts.</cite></p>
+<p><cite>Examples of maps with proportional symbols: on the right with a grouping of points with
+the administrative layer of districts.</cite></p>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p><strong>Points</strong></p>
@@ -238,7 +247,7 @@ A circle whose size is proportional to the number of events is then created.</p>
 </div></blockquote>
 <p><strong>Polygons [optional]</strong></p>
 <blockquote>
-<div><p>The optional polygon layer to agregate points and use the centroïd of areas.</p>
+<div><p>The optional polygon layer to aggregate points and use the centroid of areas.</p>
 </div></blockquote>
 <p><strong>Count field name</strong></p>
 <blockquote>
@@ -253,7 +262,7 @@ A circle whose size is proportional to the number of events is then created.</p>
 <div class="section" id="grid-map">
 <h1>Grid Map<a class="headerlink" href="#grid-map" title="Permalink to this headline">¶</a></h1>
 <a class="reference internal image-reference" href="_images/GridMap2.png"><img alt="_images/GridMap2.png" src="_images/GridMap2.png" style="width: 99%;" /></a>
-<p>The grid map divide the area into squares and represent the number of events present in each cell.</p>
+<p>The grid map divides the area into squares and represents the number of events present in each cell.</p>
 <p>The operation is quite simple.
 The program creates a layer of polygons (squares) whose size can be configured.
 Then the number of events present in each square is counted.</p>
@@ -271,7 +280,7 @@ Then the number of events present in each square is counted.</p>
 </div></blockquote>
 <p><strong>Size of the grid</strong></p>
 <blockquote>
-<div><p>Distance parameter to define the size of each cell (in the unit of the points layer).</p>
+<div><p>Distance parameter to define the size of each cell (in the units of the points layer).</p>
 </div></blockquote>
 <p><strong>Count field name</strong></p>
 <blockquote>
@@ -320,7 +329,7 @@ A new polygon layer containing a column storing the values is created.</p>
 <h2>Configuration<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p><strong>Polygons</strong></p>
 <blockquote>
-<div><p>The polygon layer to agregate points.</p>
+<div><p>The polygon layer to aggregate points.</p>
 </div></blockquote>
 <p><strong>Points</strong></p>
 <blockquote>
@@ -332,7 +341,7 @@ A new polygon layer containing a column storing the values is created.</p>
 </div></blockquote>
 <p><strong>Multiplier [optional]</strong></p>
 <blockquote>
-<div><p>A numeric value for wheighting (default value si %)</p>
+<div><p>A numeric value for weighting (default value si %)</p>
 </div></blockquote>
 <p><strong>Count field name</strong></p>
 <blockquote>
@@ -354,7 +363,7 @@ but only if the distance between them is less than a configurable threshold (e. 
 <h2>Configuration<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p><strong>Lines</strong></p>
 <blockquote>
-<div><p>The input lines layer to agregate points.</p>
+<div><p>The input lines layer to aggregate points.</p>
 </div></blockquote>
 <p><strong>Points</strong></p>
 <blockquote>
@@ -367,7 +376,7 @@ If they are not set, the closest line is used.</p>
 </div></blockquote>
 <p><strong>Maximum distance to the line</strong></p>
 <blockquote>
-<div><p>A distance parameter (in unit of the line layer) to avoid the projection of points too far from the lines.</p>
+<div><p>A distance parameter (in units of the line layer) to avoid the projection of points too far from the lines.</p>
 </div></blockquote>
 <p><strong>Count field name</strong></p>
 <blockquote>
@@ -376,7 +385,7 @@ If they are not set, the closest line is used.</p>
 <p><strong>Outputs</strong></p>
 <blockquote>
 <div><p>A new line layer with a count field.</p>
-<p>A new proportional symbols layer with two class of points:
+<p>A new proportional symbols layer with two classes of points:
 points linked to a line (in green) and points not linked to a line (in red).</p>
 </div></blockquote>
 </div>
@@ -393,11 +402,11 @@ but only if the distance between them is less than a configurable threshold (e. 
 <h2>Configuration<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p><strong>Lines</strong></p>
 <blockquote>
-<div><p>The input lines layer to agregate points.</p>
+<div><p>The input lines layer to aggregate points.</p>
 </div></blockquote>
 <p><strong>Size of the segments</strong></p>
 <blockquote>
-<div><p>A distance parameter (in unit of the line layer) to split the lines in segments</p>
+<div><p>A distance parameter (in units of the line layer) to split the lines in segments</p>
 </div></blockquote>
 <p><strong>Points</strong></p>
 <blockquote>
@@ -410,7 +419,7 @@ If they are not set, the closest line is used.</p>
 </div></blockquote>
 <p><strong>Maximum distance to the line</strong></p>
 <blockquote>
-<div><p>A distance parameter (in unit of the line layer) to avoid the projection of points too far from the lines.</p>
+<div><p>A distance parameter (in units of the line layer) to avoid the projection of points too far from the lines.</p>
 </div></blockquote>
 <p><strong>Count field name</strong></p>
 <blockquote>
@@ -419,7 +428,7 @@ If they are not set, the closest line is used.</p>
 <p><strong>Outputs</strong></p>
 <blockquote>
 <div><p>A new line layer with a count field.</p>
-<p>A new proportional symbols layer with two class of points:
+<p>A new proportional symbols layer with two classes of points:
 points linked to a line (in green) and points not linked to a line (in red).</p>
 </div></blockquote>
 </div>
@@ -427,7 +436,8 @@ points linked to a line (in green) and points not linked to a line (in red).</p>
 <div class="section" id="nearest-neighbours-clusters-map">
 <h1>Nearest Neighbours Clusters Map<a class="headerlink" href="#nearest-neighbours-clusters-map" title="Permalink to this headline">¶</a></h1>
 <a class="reference internal image-reference" href="_images/NearNeighborsMap2.png"><img alt="_images/NearNeighborsMap2.png" src="_images/NearNeighborsMap2.png" style="width: 99%;" /></a>
-<p>The map shows the hotspots identified by the analysis of the closest neighbours. This algorithm is a simplified version of Ned Levine’s algorithm <a class="reference internal" href="#ned2015" id="id5"><span>[ned2015]</span></a> in
+<p>The map shows the hotspots identified by the analysis of the closest neighbours.
+This algorithm is a simplified version of Ned Levine’s algorithm <a class="reference internal" href="#ned2015" id="id5"><span>[ned2015]</span></a> in
 CrimeStat: <a class="reference external" href="http://nij.gov/topics/technology/maps/pages/crimestat.aspx">http://nij.gov/topics/technology/maps/pages/crimestat.aspx</a>.</p>
 <div class="section" id="explaination">
 <h2>Explaination<a class="headerlink" href="#explaination" title="Permalink to this headline">¶</a></h2>
@@ -441,8 +451,8 @@ if the distance is less than or equal to the search distance.</p>
 <p>2. The event with the most neighbours is selected. They form the first hot spot.
 They are removed from the distribution and the following event with the highest number
 of neighbours is selected. They form the second hot-spot, etc.
-The algorithm is recursive until there is no more events with a number of neighbours greater than or equal to
-to the defined cluster size.</p>
+The algorithm is recursive until there is no more events with a number of neighbours
+greater than or equal to the defined cluster size.</p>
 <p>3. For each cluster, the centre of gravity is calculated.
 The distances are recalculated with the gravity centres to ensure
 that the areas do not overlap. Indeed, some events may
@@ -450,7 +460,7 @@ change groups if two hotspots are spatially close.</p>
 <p>4. The convex envelope of each cluster is used to
 represent the hot points by polygons.</p>
 </div></blockquote>
-<p>Unlike Ned Levine’s algorithm in CrimeStat (Nearest Neighbor Hierarchical Clustering) <a class="reference internal" href="#ned2015" id="id6"><span>[ned2015]</span></a>,
+<p>Unlike Ned Levine’s algorithm in CrimeStat (Nearest Neighbour Hierarchical Clustering) <a class="reference internal" href="#ned2015" id="id6"><span>[ned2015]</span></a>,
 the map represents only first-order clusters.</p>
 </div>
 <div class="section" id="examples">
@@ -463,7 +473,7 @@ method rather than a density map or grid map</p>
 In addition, the quantities directly represent the number of events that occurred in each area.</p>
 <a class="reference internal image-reference" href="_images/NearNeighborsVSGrid.png"><img alt="_images/NearNeighborsVSGrid.png" src="_images/NearNeighborsVSGrid.png" style="width: 99%;" /></a>
 <p>Areas are defined directly by the distribution of the events, while on a grid map
-the agregation is defined by the size of the grid and the position of the total area.
+the aggregation is defined by the size of the grid and the position of the total area.
 On a grid map, the origin of the grid changes the representation.</p>
 </div>
 <div class="section" id="id7">
@@ -474,7 +484,7 @@ On a grid map, the origin of the grid changes the representation.</p>
 </div></blockquote>
 <p><strong>Maximum distance between points</strong></p>
 <blockquote>
-<div><p>A distance parameter (in unit of the point layer) to define what is a close neighbour.</p>
+<div><p>A distance parameter (in units of the point layer) to define what is a close neighbour.</p>
 <p>The choice of the distance should be guided by the <strong>average distance expected if the points were randomly distributed</strong>:</p>
 <p><cite>d = 0.5 * Square root of A/n where A = area and n = number of events</cite></p>
 </div></blockquote>
@@ -498,20 +508,61 @@ On a grid map, the origin of the grid changes the representation.</p>
 <a class="reference internal image-reference" href="_images/LisaLocalGiStar.png"><img alt="_images/LisaLocalGiStar.png" src="_images/LisaLocalGiStar.png" style="width: 49%;" /></a>
 <a class="reference internal image-reference" href="_images/LisaLocalMoranI.png"><img alt="_images/LisaLocalMoranI.png" src="_images/LisaLocalMoranI.png" style="width: 49%;" /></a>
 <a class="reference internal image-reference" href="_images/LisaLocalMoranCotypes.png"><img alt="_images/LisaLocalMoranCotypes.png" src="_images/LisaLocalMoranCotypes.png" style="width: 49%;" /></a>
+<p>Analysis of local spatial autocorrelation statistics.
+The plugin cover the Local Moran’s I <em>(Clusters and Outliers Analysis)</em>, and Getis-Ord Gi* <em>(Hot-Spot Analysis)</em> statistics.</p>
 <p>These maps are generated with PySAL: Python Spatial Analysis Library from Rey, S.J. and L. Anselin <a class="reference internal" href="#ran2010" id="id8"><span>[ran2010]</span></a></p>
+<p>see: <a class="reference external" href="https://geodacenter.github.io/workbook/6a_local_auto/lab6a.html">https://geodacenter.github.io/workbook/6a_local_auto/lab6a.html</a></p>
+<div class="section" id="id9">
+<h2>Configuration<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<p><strong>Polygons</strong></p>
+<blockquote>
+<div><p>The input polygons layer.</p>
+</div></blockquote>
+<p><strong>Values</strong></p>
+<blockquote>
+<div><p>The numeric field used to perform the analysis</p>
+</div></blockquote>
+<p><strong>LISA Indicator</strong></p>
+<blockquote>
+<div><p><em>Local Moran’s I</em> : Clusters and Outliers Analysis (HH, HL, LH, LL) based on covariance</p>
+<p><em>Getis-Ord Gi*</em> : Hot-Spot Analysis based on the product of intensities</p>
+</div></blockquote>
+<p><strong>Spatial weight matrix</strong></p>
+<blockquote>
+<div><p>The W matrix is called the connectivity, contiguity or spatial weight matrix
+whose values are a function of some measure of contiguity in the original data</p>
+<p><em>Queen</em> : Common sides and common vertices of the polygons are considered</p>
+<p><em>Rook</em> : Only common sides of the polygons are considered</p>
+<p><em>Bishop</em> : Only common vertices of the polygons are considered</p>
+<p><em>Distance</em> : Distance-based spatial weights</p>
+<p><em>Near neighbours</em> : K-Nearest Neighbour weights</p>
+</div></blockquote>
+<p><strong>Distance [optional]</strong></p>
+<blockquote>
+<div><p><em>If distance-based spatial weights is used</em> : bandwidth, in units appropriate for the projection used</p>
+<p><em>If K-Nearest Neighbour weights is used</em> : number of neighbours (k)</p>
+</div></blockquote>
+<p><strong>Output</strong></p>
+<blockquote>
+<div><p>A new polygon layer with the results of the spatial analysis.</p>
+</div></blockquote>
 </div>
-<div class="section" id="k-nearest-neighours-analysis">
-<h1>K-Nearest Neighours analysis<a class="headerlink" href="#k-nearest-neighours-analysis" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="k-nearest-neighbours-analysis">
+<h1>K-Nearest Neighbours analysis<a class="headerlink" href="#k-nearest-neighbours-analysis" title="Permalink to this headline">¶</a></h1>
 <a class="reference internal image-reference" href="_images/NearNeighborsAnalysis.png"><img alt="_images/NearNeighborsAnalysis.png" src="_images/NearNeighborsAnalysis.png" style="width: 99%;" /></a>
+<p>A simple visualization with plotly of the K-Nearest Neighbours of a points layer.
+A Nearest Neighbour Index (NNI) plot is also calculated.</p>
+<p>To extract the data: open the output HTML file (in the results viewer) and click on <em>‘Export to plot.ly’</em>
+(not available within the dialog)</p>
 </div>
 <div class="section" id="acknowledgements">
 <span id="index-2"></span><h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h1>
 <p>This 3.0 version was created with Plugin Builder</p>
-<p>It integrate:</p>
+<p>It integrates:</p>
 <ul class="simple">
-<li><p>the plugin SpreadsheetLayers (C) 2014 by Camptocamp (<a class="reference external" href="https://github.com/camptocamp/QGIS-SpreadSheetLayers">https://github.com/camptocamp/QGIS-SpreadSheetLayers</a>)</p></li>
 <li><p>a light version of the pysal module for LISA analysis (<a class="reference external" href="https://pysal.readthedocs.io/en/latest/">https://pysal.readthedocs.io/en/latest/</a>)</p></li>
-<li><p>functionalities inspired from Victor Olaya processing plugins (<a class="reference external" href="https://github.com/volaya?tab=repositories">https://github.com/volaya?tab=repositories</a>)</p></li>
+<li><p>functionalities inspired from Victor Olaya’s processing plugins (<a class="reference external" href="https://github.com/volaya?tab=repositories">https://github.com/volaya?tab=repositories</a>)</p></li>
 <li><p>functionalities inspired from Crimestat made under the direction of Ned Levine (<a class="reference external" href="https://nij.gov/topics/technology/maps/pages/crimestat.aspx">https://nij.gov/topics/technology/maps/pages/crimestat.aspx</a>)</p></li>
 </ul>
 </div>
