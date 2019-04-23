@@ -32,14 +32,10 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 
 __revision__ = '$Format:%H$'# -*- coding: utf-8 -*-
 
-import os
-
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QVariant
 
-
-from qgis.core import (QgsApplication,
-                       QgsGeometry,
+from qgis.core import (QgsGeometry,
                        QgsFeatureSink,
                        QgsFeatureRequest,
                        QgsFeature,
@@ -52,13 +48,13 @@ from qgis.core import (QgsApplication,
                        QgsProcessingParameterField,
                        QgsProcessingParameterNumber,
                        QgsProcessingUtils,
-                       QgsSpatialIndex)
-
-from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
+                       QgsProcessingParameterDefinition,
+                       QgsSettings)
 
 from .utils import renderers
+from .visualist_alg import VisualistAlgorithm
 
-class PointsInPolygon(QgisAlgorithm):
+class PointsInPolygon(VisualistAlgorithm):
     dest_id = None  # Save a reference to the output layer id
 
     POLYGONS = 'POLYGONS'
@@ -68,41 +64,36 @@ class PointsInPolygon(QgisAlgorithm):
     WEIGHT = 'WEIGHT'
     MULTIPLIER = 'MULTIPLIER'
 
-    def icon(self):
-        iconName = 'choropleth.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
-
-    def group(self):
-        return self.tr(self.groupId())
-
-    def groupId(self):
-        return 'Cartography'
-
     def __init__(self):
         super().__init__()
+
+    def name(self):
+        return 'choroplethmap'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.POLYGONS,
                                                               self.tr('Polygons'), [QgsProcessing.TypeVectorPolygon]))
         self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
                                                               self.tr('Points'), [QgsProcessing.TypeVectorPoint]))
-        self.addParameter(QgsProcessingParameterField(self.WEIGHT,
+
+        weight_field = QgsProcessingParameterField(self.WEIGHT,
                                                       self.tr('Weight field'), parentLayerParameterName=self.POLYGONS,
-                                                      optional=True))
-        self.addParameter(QgsProcessingParameterNumber(self.MULTIPLIER,
+                                                      optional=True)
+        weight_field.setFlags(weight_field.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(weight_field)
+
+        multiplier_field = QgsProcessingParameterNumber(self.MULTIPLIER,
                                                       self.tr('Multiplier (default is %)'),
                                                       optional=True,
-                                                      defaultValue=100))
-        self.addParameter(QgsProcessingParameterString(self.FIELD,
-                                                       self.tr('Count field name'), defaultValue='NUMPOINTS'))
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(self.OUTPUT, self.tr('Choropleth Map'), QgsProcessing.TypeVectorPolygon))
+                                                      defaultValue=100)
+        multiplier_field.setFlags(multiplier_field.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(multiplier_field)
 
-    def name(self):
-        return 'countpointsinpolygon'
+        count_field = QgsProcessingParameterString(self.FIELD, self.tr('Count field name'), defaultValue='NUMPOINTS')
+        count_field.setFlags(count_field.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(count_field)
 
-    def displayName(self):
-        return self.tr('Choropleth Map')
+        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, self.tr('Choropleth Map'), QgsProcessing.TypeVectorPolygon))
 
     def postProcessAlgorithm(self, context, feedback):
         """

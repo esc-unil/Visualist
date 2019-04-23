@@ -30,66 +30,84 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 
 __revision__ = '$Format:%H$'
 
+from qgis.core import (QgsProcessing,
+                        QgsProcessingMultiStepFeedback,
+                        QgsProcessingParameterFeatureSource,
+                        QgsProcessingParameterFeatureSink,
+                        QgsProcessingParameterDistance,
+                        QgsProcessingParameterField,
+                        QgsProcessingParameterString,
+                        QgsProcessingParameterDefinition)
 
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtCore import QVariant
-
-from qgis.core import QgsProcessing
-from qgis.core import QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterNumber
-from qgis.core import QgsProcessingParameterFeatureSource
-from qgis.core import QgsProcessingParameterFeatureSink
-from qgis.core import QgsProcessingUtils
-from qgis.core import QgsProcessingParameterDistance
-from qgis.core import QgsProcessingParameterField
-
-from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
+from .visualist_alg import VisualistAlgorithm
 from tempfile import gettempdir
-
 import processing, os
 
-def count_iterable(i):
-    return sum(1 for e in i)
+class PointsToSplitLine(VisualistAlgorithm):
 
-class PointsToSplitLine(QgisAlgorithm):
-
-    def icon(self):
-        iconName = 'graduated.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
-
-    def group(self):
-        return self.tr(self.groupId())
-
-    def groupId(self):
-        return 'Cartography'
+    LINES = 'LINES'
+    SEGMENT_SIZE = 'SEGMENT_SIZE'
+    POINTS = 'POINTS'
+    DIST = 'DIST'
+    FIELD = 'FIELD'
+    POINTS_ROAD_NAMES = 'POINTS_ROAD_NAMES'
+    LINES_ROAD_NAMES = 'LINES_ROAD_NAMES'
+    OUTPUT_POINT = 'OUTPUT_POINT'
+    OUTPUT_LINE = 'OUTPUT_LINE'
 
     def __init__(self):
         super().__init__()
 
+    def name(self):
+        return 'graduatedsegmentedlinemap'
+
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource('linelayer', self.tr('Line Layer'), types=[QgsProcessing.TypeVectorLine], defaultValue=None))
-        self.addParameter(QgsProcessingParameterDistance('segmentsize', self.tr('Size of the segments'), parentParameterName='linelayer', defaultValue=200))
-        self.addParameter(QgsProcessingParameterField('LINES_ROAD_NAMES',
-                                                    self.tr('Names of roads in line layer'),
-                                                    type=QgsProcessingParameterField.String,
-                                                    parentLayerParameterName='linelayer',
-                                                    allowMultiple=False, defaultValue=None, optional=True))
-        self.addParameter(QgsProcessingParameterFeatureSource('pointlayer', self.tr('Point Layer'), types=[QgsProcessing.TypeVectorPoint], defaultValue=None))
-        self.addParameter(QgsProcessingParameterDistance('distancetoline', self.tr('Maximum Distance to the line'), parentParameterName='pointlayer', defaultValue=100))
-        self.addParameter(QgsProcessingParameterField('POINTS_ROAD_NAMES',
+
+        self.addParameter(QgsProcessingParameterFeatureSource(self.LINES,
+                                            self.tr('Line Layer'),
+                                            types=[QgsProcessing.TypeVectorLine],
+                                            defaultValue=None))
+        self.addParameter(QgsProcessingParameterDistance(self.SEGMENT_SIZE,
+                                            self.tr('Size of the segments'),
+                                            parentParameterName=self.LINES,
+                                            defaultValue=200))
+
+        self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
+                                            self.tr('Point Layer'),
+                                            types=[QgsProcessing.TypeVectorPoint],
+                                            defaultValue=None))
+
+        self.addParameter(QgsProcessingParameterDistance(self.DIST,
+                                            self.tr('Maximum distance to the line'),
+                                            parentParameterName=self.POINTS,
+                                            defaultValue=100))
+
+        lroad_fied = QgsProcessingParameterField(self.LINES_ROAD_NAMES,
+                                            self.tr('Names of roads in line layer'),
+                                            type=QgsProcessingParameterField.String,
+                                            parentLayerParameterName=self.LINES,
+                                            allowMultiple=False, defaultValue=None, optional=True)
+        lroad_fied.setFlags(lroad_fied.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(lroad_fied)
+
+        proad_field = QgsProcessingParameterField(self.POINTS_ROAD_NAMES,
                                     self.tr('Names of roads in point layer'),
                                     type=QgsProcessingParameterField.String,
-                                    parentLayerParameterName='pointlayer',
-                                    allowMultiple=False, defaultValue=None, optional=True))
-        self.addParameter(QgsProcessingParameterFeatureSink('LineMap', self.tr('Graduated Segmented Line Map'), type=QgsProcessing.TypeVectorLine, createByDefault=True, defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSink('propMap',
-                                                    self.tr('Points linked to Line Map'), QgsProcessing.TypeVectorPoint))
+                                    parentLayerParameterName=self.POINTS,
+                                    allowMultiple=False, defaultValue=None, optional=True)
+        proad_field.setFlags(proad_field.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(proad_field)
 
-    def name(self):
-        return 'pointstosplitline'
+        count_field = QgsProcessingParameterString(self.FIELD, self.tr('Count field name'), defaultValue='NUMPOINTS')
+        count_field.setFlags(count_field.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(count_field)
 
-    def displayName(self):
-        return self.tr('Graduated Segmented Lines Map')
+        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_LINE,
+                                                    self.tr('Graduated Line Map'),
+                                                    QgsProcessing.TypeVectorLine))
+        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_POINT,
+                                                    self.tr('Points linked to Line Map'),
+                                                    QgsProcessing.TypeVectorPoint))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
@@ -103,8 +121,8 @@ class PointsToSplitLine(QgisAlgorithm):
         try:    #valid since 3.6
             # Division des lignes par longueur maximale
             alg_params = {
-                'INPUT': parameters['linelayer'],
-                'LENGTH': parameters['segmentsize'],
+                'INPUT': parameters[self.LINES],
+                'LENGTH': parameters[self.SEGMENT_SIZE],
                 'OUTPUT': temporary_path
             }
             output = processing.run('native:splitlinesbylength', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
@@ -112,52 +130,18 @@ class PointsToSplitLine(QgisAlgorithm):
         except: #valid for 3.4-ltr + Grass
             # Division des lignes par longueur maximale
             alg_params = {
-                'INPUT': parameters['linelayer'],
-                'DISTANCE': parameters['segmentsize'],
+                'INPUT': parameters[self.LINES],
+                'DISTANCE': parameters[self.SEGMENT_SIZE],
                 'OUTPUT': temporary_path
             }
             output = processing.run('native:segmentizebymaxdistance', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
             outputs['segmentedLayer'] = output['OUTPUT']
 
-            #Version with Grass
-            # alg_params = {
-            #     '-f': False,
-            #     '-n': False,
-            #     'GRASS_MIN_AREA_PARAMETER': 0.0001,
-            #     'GRASS_OUTPUT_TYPE_PARAMETER': 2,
-            #     'GRASS_REGION_PARAMETER': None,
-            #     'GRASS_SNAP_TOLERANCE_PARAMETER': -1,
-            #     'GRASS_VECTOR_DSCO': '',
-            #     'GRASS_VECTOR_EXPORT_NOCAT': False,
-            #     'GRASS_VECTOR_LCO': '',
-            #     'input': parameters['linelayer'],
-            #     'length': parameters['segmentsize'],
-            #     'units': 1,
-            #     'vertices': None,
-            #     'output': temporary_path
-            # }
-            #
-            # output = processing.run('grass7:v.split', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            # segmented_layer = QgsProcessingUtils.mapLayerFromString(output['output'], context=context)
-            # outputs['segmentedLayer'] = segmented_layer
-
-
         feedback.setCurrentStep(1)
         if feedback.isCanceled():
             return {}
-
+        parameters['LINES'] = outputs['segmentedLayer']
         # Graduated Lines Map
-        alg_params = {
-            'DIST': parameters['distancetoline'],
-            'FIELD': 'NUMPOINTS',
-            'LINES': outputs['segmentedLayer'],
-            'STRING_MATCHING' : True,
-            'LINES_ROAD_NAMES': parameters['LINES_ROAD_NAMES'],
-            'POINTS': parameters['pointlayer'],
-            'POINTS_ROAD_NAMES': parameters['POINTS_ROAD_NAMES'],
-            'OUTPUT_LINE': parameters['LineMap'],
-            'OUTPUT_POINT': parameters['propMap']
-        }
-        outputs['GraduatedLinesMap'] = processing.run('visualist:pointstoline', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['GraduatedLinesMap'] = processing.run('visualist:graduatedlinemap', parameters, context=context, feedback=feedback, is_child_algorithm=True)
         results['LineMap'] = outputs['GraduatedLinesMap']['OUTPUT_LINE']
         return results

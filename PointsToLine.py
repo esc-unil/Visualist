@@ -30,56 +30,32 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 
 __revision__ = '$Format:%H$'
 
-import math, os
-import urllib.parse
-from tempfile import gettempdir
+import os, re, unicodedata
 
-from shapely.geometry import LineString, MultiPoint
-from shapely.ops import split
-
-from qgis.PyQt.QtGui import QIcon, QColor
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QVariant
-from qgis.utils import iface
-from qgis.core import (QgsApplication,
-                       QgsField,
+from qgis.core import (QgsField,
                        QgsFeatureSink,
                        QgsFeature,
                        QgsGeometry,
-                       QgsLineString,
-                       QgsPoint,
-                       QgsPointXY,
                        QgsRectangle,
-                       QgsWkbTypes,
                        QgsProcessing,
                        QgsProcessingException,
-                       QgsProcessingParameterEnum,
-                       QgsProcessingParameterExtent,
-                       QgsProcessingParameterNumber,
                        QgsProcessingParameterDistance,
-                       QgsProcessingParameterCrs,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterString,
-                       QgsProcessingParameterBoolean,
                        QgsProcessingParameterField,
-                       QgsProcessingParameterVectorLayer,
+                       QgsProcessingParameterDefinition,
                        QgsFields,
                        QgsProcessingUtils,
                        QgsFeatureRequest,
-                       QgsSpatialIndex,
                        QgsCoordinateTransform,
-                       QgsVectorLayer,
-                       QgsProject,
                        QgsStringUtils,
                        QgsMessageLog)
 
-from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
-import processing
-
+from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
-
-# SK: Librairies pour comparaison chaine de caracteres des rues
-import csv, re, unicodedata
 
 #Convenient function to debug
 NAME = "Visualist"
@@ -89,7 +65,7 @@ def count_iterable(i):
     return sum(1 for e in i)
 
 
-class PointsToLine(QgisAlgorithm):
+class PointsToLine(VisualistAlgorithm):
     LINES = 'LINES'
     POINTS = 'POINTS'
     DIST = 'DIST'
@@ -99,42 +75,17 @@ class PointsToLine(QgisAlgorithm):
     OUTPUT_POINT = 'OUTPUT_POINT'
     OUTPUT_LINE = 'OUTPUT_LINE'
 
-    def icon(self):
-        iconName = 'graduated.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
-
-    def group(self):
-        return self.tr(self.groupId())
-
-    def groupId(self):
-        return 'Cartography'
-
     def __init__(self):
         super().__init__()
 
-    def helpUrl(self):
-        url = os.path.join("file:///"+os.path.dirname(__file__).replace("\\","/"),"help/build/html/index.html")
-        log(url)
-        return url
-
-    def shortDescription(self):
-        help = """Graduated line maps represent the number of events along roads (polyline layer).
-            Events are projected onto the segments closest to their positions,
-            but only if the distance between them is less than a configurable threshold (e. g. 50 meters)."""
-        return help
+    def name(self):
+        return 'graduatedlinemap'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.LINES,
                                             self.tr('Line Layer'),
                                             types=[QgsProcessing.TypeVectorLine],
                                             defaultValue=None))
-
-
-        self.addParameter(QgsProcessingParameterField(self.LINES_ROAD_NAMES,
-                                            self.tr('Names of roads in line layer'),
-                                            type=QgsProcessingParameterField.String,
-                                            parentLayerParameterName=self.LINES,
-                                            allowMultiple=False, defaultValue=None, optional=True))
 
         self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
                                             self.tr('Point Layer'),
@@ -146,25 +97,30 @@ class PointsToLine(QgisAlgorithm):
                                                     parentParameterName=self.POINTS,
                                                     defaultValue=100))
 
+        lroad_fied = QgsProcessingParameterField(self.LINES_ROAD_NAMES,
+                                            self.tr('Names of roads in line layer'),
+                                            type=QgsProcessingParameterField.String,
+                                            parentLayerParameterName=self.LINES,
+                                            allowMultiple=False, defaultValue=None, optional=True)
+        lroad_fied.setFlags(lroad_fied.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(lroad_fied)
 
-        self.addParameter(QgsProcessingParameterField(self.POINTS_ROAD_NAMES,
+        proad_field = QgsProcessingParameterField(self.POINTS_ROAD_NAMES,
                                     self.tr('Names of roads in point layer'),
                                     type=QgsProcessingParameterField.String,
                                     parentLayerParameterName=self.POINTS,
-                                    allowMultiple=False, defaultValue=None, optional=True))
+                                    allowMultiple=False, defaultValue=None, optional=True)
+        proad_field.setFlags(proad_field.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(proad_field)
 
-        self.addParameter(QgsProcessingParameterString(self.FIELD,
-                                                    self.tr('Count field name'), defaultValue='NUMPOINTS'))
+        count_field = QgsProcessingParameterString(self.FIELD, self.tr('Count field name'), defaultValue='NUMPOINTS')
+        count_field.setFlags(count_field.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(count_field)
+
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_LINE,
                                                     self.tr('Graduated Line Map'), QgsProcessing.TypeVectorLine))
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_POINT,
                                                     self.tr('Points linked to Line Map'), QgsProcessing.TypeVectorPoint))
-    def name(self):
-        return 'pointstoline'
-
-    def displayName(self):
-        return self.tr('Graduated Lines Map')
-
 
     def postProcessAlgorithm(self, context, feedback):
         """

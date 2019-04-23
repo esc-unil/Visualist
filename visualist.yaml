@@ -1,0 +1,71 @@
+choroplethmap:
+  displayName:  Choropleth Map
+  icon:         choropleth.png
+  group:        Cartography
+  helpUrl:      '#choropleth-map'
+  description:  >
+    Choropleth maps represent a quantity (number of events, percentages, etc.) by color (or pattern)
+    for administrative areas. They allow values to be compared by region and demographic information to be used
+    to weight measurements.
+gridmap:
+  displayName:  Grid Map
+  icon:         grid.png
+  group:        Cartography
+  helpUrl:      '#grid-map'
+  description:  >
+    The grid map divide the area into squares and represent the number of events wihtin each cell.
+    The operation is quite simple. The program creates a layer of polygons (squares) whose size can be configured.
+    Then the number of events in each square is counted.
+    The choice of the grid size can be guided by the average distance expected if the points were randomly distributed.
+graduatedlinemap:
+  displayName:  Graduated Lines Map
+  icon:         graduated.png
+  group:        Cartography
+  helpUrl:      '#graduated-lines-map'
+  description:  >
+    Graduated line maps represent the number of events along roads (polyline layer).
+    Events are projected onto the segments closest to their positions,
+    but only if the distance between them is less than a configurable threshold (e. g. 50 meters)
+graduatedsegmentedlinemap:
+  displayName:  Graduated Segmented Lines Map
+  icon:         graduated.png
+  group:        Cartography
+  helpUrl:      '#graduated-segmented-lines-map'
+  description:  >
+    Graduated Segmented line maps represent the number of events along roads (polyline layer).
+    The algorithm starts by dividing the roads into segments whose length can be configured.
+    The segment closest to each point is then identified. Events are projected onto the
+    segments closest to their positions, but only if the distance between them is less than
+    a configurable threshold (e. g. 50 meters).
+nearestneighboursmap:
+  displayName:  Nearest Neighbours Clusters Map
+  icon:         knn.png
+  group:        Cartography
+  helpUrl:      '#nearest-neighbours-clusters-map'
+  description:  >
+    The map shows the hotspots identified by the analysis of the closest neighbours.
+    This algorithm is a simplified version of Ned Levine’s algorithm in CrimeStat.
+proportionalsymbolsmap:
+  displayName:  Proportional Symbols Map
+  icon:         proportional.png
+  group:        Cartography
+  helpUrl:      '#proportional-symbols-map'
+  description:  >
+    Proportional symbol maps group all points with the same position together at a single point.
+    A circle whose size is proportional to the number of events is then created.
+
+    The points can also be grouped with a polygon layer to represent all events within each area as a single agregate.
+lisamap:
+  displayName:  Spatial Autocorrelation Map
+  icon:         lisa.png
+  group:        Cartography
+  helpUrl:      '#spatial-autocorrelation-map'
+  description:  >
+    LISA Analysis.
+nearestneighbouranalysis:
+  displayName:  Nearest neighbour analysis
+  icon:         knn.png
+  group:        Spatial statistics
+  helpUrl:      '#k-nearest-neighours-analysis'
+  description:  >
+    Plot the k-nearest neighour distances and calculate the NN-Index.

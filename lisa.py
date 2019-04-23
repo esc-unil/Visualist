@@ -31,17 +31,11 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 __revision__ = '$Format:%H$'
 
 import os, tempfile, sys
-
 from . import pysal
 import numpy
-import processing
 
-from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QVariant
-from qgis.utils import iface
-from qgis.core import (QgsApplication,
-                QgsProject,
-                QgsSettings,
+from qgis.core import (
                 QgsProcessingParameterFeatureSink,
                 QgsProcessingParameterVectorLayer,
                 QgsProcessingParameterField,
@@ -56,10 +50,10 @@ from qgis.core import (QgsApplication,
                 QgsProcessingParameterEnum
                 )
 
-from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
+from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
 
-class LocalIndicatorSpatialA(QgisAlgorithm):
+class LocalIndicatorSpatialA(VisualistAlgorithm):
     dest_id = None  # Save a reference to the output layer id
 
     POLYGONS = 'POLYGONS'
@@ -71,24 +65,11 @@ class LocalIndicatorSpatialA(QgisAlgorithm):
     LISA_TYPE = {0:'Moran\'s I',1:'Getis-Ord Gi*'}
     W_TYPE = {0:'Queen', 1:'Rook', 2:'Bishop', 3:'2 Nearest neighbors', 4:'3 Nearest neighbors'}
 
-    def icon(self):
-        iconName = 'lisa.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
-
-    def group(self):
-        return self.tr(self.groupId())
-
-    def groupId(self):
-        return 'Cartography'
-
-    def name(self):
-        return 'lisa'
-
-    def displayName(self):
-        return self.tr('Spatial Autocorrelation Map')
-
     def __init__(self):
         super().__init__()
+
+    def name(self):
+        return 'lisamap'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterVectorLayer(self.POLYGONS,

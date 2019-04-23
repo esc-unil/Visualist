@@ -33,9 +33,11 @@ __revision__ = '$Format:%H$'
 import os
 import sys
 import inspect
+import yaml
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
-from qgis.core import QgsProcessingAlgorithm, QgsApplication, QgsMessageLog
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from qgis.core import QgsProcessingAlgorithm, QgsApplication, QgsMessageLog, QgsSettings
+
 from .visualist_provider import VisualistProvider
 from . import resources
 
@@ -75,6 +77,17 @@ class VisualistPlugin(object):
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
                 log('Translator added')
+
+        #Store settings used by the plugin
+        s = QgsSettings()
+        s.setValue("visualist/homepage", "https://ipsac2.unil.ch/main/")
+
+        yaml_path = os.path.join(
+            self.plugin_dir,'visualist.yaml')
+        yaml_stream = open(yaml_path, 'r')
+        yaml_document = yaml.safe_load(yaml_stream)
+        for helper in yaml_document:
+            s.setValue("visualist/help/"+helper, yaml_document[helper])
 
     def initGui(self):
         QgsApplication.processingRegistry().addProvider(self.provider)

@@ -30,14 +30,10 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 
 __revision__ = '$Format:%H$'
 
-import os
-
-from qgis.PyQt.QtGui import QIcon, QColor
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QVariant
 
-
-from qgis.core import (QgsApplication,
-                       QgsGeometry,
+from qgis.core import (QgsGeometry,
                        QgsFeatureSink,
                        QgsFeatureRequest,
                        QgsFeature,
@@ -47,16 +43,13 @@ from qgis.core import (QgsApplication,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterString,
-                       QgsProcessingParameterField,
                        QgsProcessingUtils,
-                       QgsSpatialIndex,
                        QgsFields)
 
-from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
-
+from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
 
-class PointsToProportional(QgisAlgorithm):
+class PointsToProportional(VisualistAlgorithm):
     dest_id = None  # Save a reference to the output layer id
 
     POLYGONS = 'POLYGONS'
@@ -64,18 +57,11 @@ class PointsToProportional(QgisAlgorithm):
     OUTPUT = 'OUTPUT'
     FIELD = 'FIELD'
 
-    def icon(self):
-        iconName = 'proportional.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
-
-    def group(self):
-        return self.tr(self.groupId())
-
-    def groupId(self):
-        return 'Cartography'
-
     def __init__(self):
         super().__init__()
+
+    def name(self):
+        return 'proportionalsymbolsmap'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
@@ -86,12 +72,6 @@ class PointsToProportional(QgisAlgorithm):
                                                        self.tr('Count field name'), defaultValue='NUMPOINTS'))
         self.addParameter(
             QgsProcessingParameterFeatureSink(self.OUTPUT, self.tr('Proportional Symbols Map'), QgsProcessing.TypeVectorPoint))
-
-    def name(self):
-        return 'proportionalpoints'
-
-    def displayName(self):
-        return self.tr('Proportional Symbols Map')
 
     def postProcessAlgorithm(self, context, feedback):
         """

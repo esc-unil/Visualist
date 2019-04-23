@@ -30,67 +30,40 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 
 __revision__ = '$Format:%H$'
 
-import os, math, operator
+import math, operator
 
-from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QVariant
-from qgis.utils import iface
-
-from qgis.core import (QgsApplication,
-                       QgsField,
+from qgis.core import (QgsField,
                        QgsFeatureSink,
                        QgsFeature,
                        QgsGeometry,
-                       QgsLineString,
-                       QgsPoint,
-                       QgsPointXY,
                        QgsRectangle,
                        QgsWkbTypes,
                        QgsProcessing,
                        QgsProcessingException,
-                       QgsProcessingParameterEnum,
-                       QgsProcessingParameterExtent,
                        QgsProcessingParameterNumber,
                        QgsProcessingParameterDistance,
-                       QgsProcessingParameterCrs,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFeatureSource,
-                       QgsProcessingParameterString,
-                       QgsProcessingParameterBoolean,
                        QgsFields,
                        QgsProcessingUtils,
                        QgsFeatureRequest,
-                       QgsSpatialIndex,
-                       QgsCoordinateTransform,
-                       QgsVectorLayer,
-                       QgsProject)
+                       QgsSpatialIndex)
 
-from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
-
+from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
 
-class PointsToNNCluster(QgisAlgorithm):
+class PointsToNNCluster(VisualistAlgorithm):
     dest_id = None  # Save a reference to the output layer id
     POINTS = 'POINTS'
     DIST = 'DIST'
     COUNT = 'COUNT'
     OUTPUT = 'OUTPUT'
 
-    def icon(self):
-        iconName = 'knn.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
-
-    def group(self):
-        return self.tr(self.groupId())
-
-    def groupId(self):
-        return 'Cartography'
-
+    def __init__(self):
+        super().__init__()
     def name(self):
-        return 'pointstonnclusters'
-
-    def displayName(self):
-        return self.tr('Nearest Neighbors Clusters Map')
+        return 'nearestneighboursmap'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.POINTS,
@@ -107,7 +80,6 @@ class PointsToNNCluster(QgisAlgorithm):
 
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT,
                                             self.tr('Near Neighbor Clusters Map'), QgsProcessing.TypeVectorLine))
-
 
     def postProcessAlgorithm(self, context, feedback):
         """
@@ -256,6 +228,3 @@ class PointsToNNCluster(QgisAlgorithm):
         A = ext.height()*ext.width()
         n = source.featureCount()
         return int(round(0.5*math.sqrt(A/n)))
-
-    def __init__(self):
-        super().__init__()

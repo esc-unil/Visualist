@@ -35,37 +35,30 @@ import os, math
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QVariant
 
-
-from qgis.core import (QgsApplication,
-                       QgsField,
+from qgis.core import (QgsField,
                        QgsFeatureSink,
                        QgsFeature,
                        QgsGeometry,
-                       QgsLineString,
                        QgsPoint,
                        QgsPointXY,
                        QgsRectangle,
                        QgsWkbTypes,
                        QgsProcessing,
                        QgsProcessingException,
-                       QgsProcessingParameterEnum,
                        QgsProcessingParameterExtent,
-                       QgsProcessingParameterNumber,
                        QgsProcessingParameterDistance,
-                       QgsProcessingParameterCrs,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterString,
                        QgsFields,
                        QgsProcessingUtils,
-                       QgsFeatureRequest,
-                       QgsSpatialIndex)
+                       QgsSpatialIndex,
+                       QgsSettings)
 
-from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
-
+from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
 
-class PointsInGrid(QgisAlgorithm):
+class PointsInGrid(VisualistAlgorithm):
     dest_id = None  # Save a reference to the output layer id
 
     POINTS = 'POINTS'
@@ -74,23 +67,23 @@ class PointsInGrid(QgisAlgorithm):
     FIELD = 'FIELD'
     OUTPUT = 'OUTPUT'
 
-    def icon(self):
-        iconName = 'grid.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
-
-    def group(self):
-        return self.tr(self.groupId())
-
-    def groupId(self):
-        return 'Cartography'
-
     def __init__(self):
         super().__init__()
+
+
+    def name(self):
+        return 'gridmap'
+
+    def randDist(self, source):
+        ext = source.sourceExtent()
+        A = ext.height()*ext.width()
+        n = source.featureCount()
+        return int(round(0.5*math.sqrt(A/n)))
 
     def initAlgorithm(self, config=None):
         point_source = QgsProcessingParameterFeatureSource(self.POINTS,self.tr('Points'), [QgsProcessing.TypeVectorPoint])
         self.addParameter(point_source)
-
+        
         self.addParameter(QgsProcessingParameterExtent(self.EXTENT, self.tr('Grid extent')))
 
         grid_size = QgsProcessingParameterDistance(self.GRID,self.tr('Size of the grid'),parentParameterName=self.POINTS,defaultValue=100)
@@ -99,19 +92,6 @@ class PointsInGrid(QgisAlgorithm):
 
         self.addParameter(QgsProcessingParameterString(self.FIELD,self.tr('Count field name'), defaultValue='NUMPOINTS'))
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT,self.tr('Grid Map'), QgsProcessing.TypeVectorPolygon))
-
-    def name(self):
-        return 'countpointsingrid'
-
-    def displayName(self):
-        return self.tr('Grid Map')
-
-
-    def randDist(self, source):
-        ext = source.sourceExtent()
-        A = ext.height()*ext.width()
-        n = source.featureCount()
-        return int(round(0.5*math.sqrt(A/n)))
 
     def postProcessAlgorithm(self, context, feedback):
         """
