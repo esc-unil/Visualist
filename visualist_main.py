@@ -56,8 +56,6 @@ log = lambda m: QgsMessageLog.logMessage(m, NAME)
 class VisualistPlugin(object):
 
     def __init__(self):
-        self.provider = VisualistProvider()
-
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
 
@@ -88,6 +86,9 @@ class VisualistPlugin(object):
         yaml_document = yaml.safe_load(yaml_stream)
         for helper in yaml_document:
             s.setValue("visualist/help/"+helper, yaml_document[helper])
+
+        #initialize provider
+        self.provider = VisualistProvider()
 
     def initGui(self):
         QgsApplication.processingRegistry().addProvider(self.provider)

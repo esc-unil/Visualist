@@ -22,5 +22,6 @@
     <file>icons/rook.png</file>
     <file>icons/bishop.png</file>
     <file>icons/visualist.png</file>
+    <file>icons/flow.png</file>
   </qresource>
 </RCC>

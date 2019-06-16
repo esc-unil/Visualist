@@ -38,8 +38,11 @@ from .PointsInGrid import PointsInGrid
 from .PointsToLine import PointsToLine
 from .PointsToSplitLine import PointsToSplitLine
 from .PointsToNNCluster import PointsToNNCluster
+from .PointsToEdge import PointsToEdge
+from .EdgesToFlow import EdgesToFlow
 from .Lisa import LocalIndicatorSpatialA
 from .NearestNeighbourAnalysis import NearestNeighbourAnalysis
+from .DistanceAnalysis import DistanceAnalysis
 
 class VisualistProvider(QgsProcessingProvider):
 
@@ -52,10 +55,13 @@ class VisualistProvider(QgsProcessingProvider):
                     PointsToProportional(),
                     PointsInGrid(),
                     PointsToLine(),
+                    PointsToEdge(),
+                    EdgesToFlow(),
                     PointsToSplitLine(),
                     PointsToNNCluster(),
                     LocalIndicatorSpatialA(),
-                    NearestNeighbourAnalysis()
+                    NearestNeighbourAnalysis(),
+                    DistanceAnalysis()
                     ]
 
 

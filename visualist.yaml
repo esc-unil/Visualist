@@ -62,8 +62,7 @@ lisamap:
   helpUrl:      '#spatial-autocorrelation-map'
   description:  >
     Analysis of local spatial autocorrelation statistics.
-    The plugin cover the Local Moran's I *(Clusters and Outliers Analysis)*, and Getis-Ord Gi* *(Hot-Spot Analysis)* statistics.
-
+    The plugin cover the Local Moran's I (Clusters and Outliers Analysis), and Getis-Ord Gi* (Hot-Spot Analysis) statistics.
 nearestneighbouranalysis:
   displayName:  Nearest neighbour analysis
   icon:         knn.png
@@ -71,3 +70,31 @@ nearestneighbouranalysis:
   helpUrl:      '#k-nearest-neighbours-analysis'
   description:  >
     Plot the k-nearest neighbour distances and calculate the NN-Index.
+distanceanalysis:
+  displayName:  Distance analysis
+  icon:         relational.png
+  group:        Spatial statistics
+  helpUrl:      '#distance-analysis'
+  description:  >
+    Distance analysis.
+pointstoedge:
+  displayName:  Edge Map
+  icon:         relational.png
+  group:        Cartography
+  helpUrl:      '#edge-map'
+  description:  >
+    Edge Map from points to display flows.
+flowmap:
+  displayName:  Flow Map
+  icon:         flow.png
+  group:        Cartography
+  helpUrl:      '#flow-map'
+  description:  |+
+    Implementation of force-directed edge bundling for the QGIS Processing toolbox as described in
+    https://anitagraser.com/2017/10/08/movement-data-in-gis-8-edge-bundling-for-flow-maps/
+
+    Usage:
+    Pre-process your data first!
+    - Use only Linestrings (no Multilinestrings)
+    - Your data should only contain lines with exactly 2 nodes: an origin node and a destination node.
+    - Once your data is sufficiently pre-processed and fulfils all above mentioned requirements, you can either first use one of the clustering algorithms and then bundle the lines, or you can directly bundle the lines (which, on the downside, will take significantly longer). Please double check the input parameters to fit your data (e.g. the "initial step size" in the "edge bundling algorithm" dependent on the coordinate reference system of your data).

@@ -1,20 +1,20 @@
-# This file contains metadata for your plugin. Since 
-# version 2.0 of QGIS this is the proper way to supply 
-# information about a plugin. The old method of 
-# embedding metadata in __init__.py will 
+# This file contains metadata for your plugin. Since
+# version 2.0 of QGIS this is the proper way to supply
+# information about a plugin. The old method of
+# embedding metadata in __init__.py will
 # is no longer supported since version 2.0.
 
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
 name=Visualist
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.4
 description=Plugin for Crime Analysts
-version=0.3
+version=0.5
 author=Quentin Rossy
 email=quentin.rossy@unil.ch
 
-about=The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks, without the need for additional software, libraries, or complex workarounds.
+about=The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks, without the need for additional software, libraries, or complex workarounds.If you use Visualist in a scientific publication, we would appreciate citations to the following paper: Rossy, Q. (2019) Visualist: a spatial analysis plugin for crime analysts. Ecole des sciences criminelles, Lausanne.
 
 tracker=https://github.com/esc-unil/Visualist/issues
 repository=https://github.com/esc-unil/Visualist/
@@ -26,7 +26,7 @@ repository=https://github.com/esc-unil/Visualist/
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=Proportional Symbols Map,Grid Map,Choropleth Map,Graduated Lines Map,Graduated Segmented Lines Map,Nearest Neighbours Clusters Map,Spatial Autocorrelation Map,LISA analysis,K-Nearest Neighours analysis
+tags=Proportional Symbols Map,Grid Map,Flow Map,Choropleth Map,Graduated Lines Map,Graduated Segmented Lines Map,Nearest Neighbours Clusters Map,Spatial Autocorrelation Map,LISA analysis,K-Nearest Neighours analysis
 
 homepage=http://analysecriminelle.org
 category=Analysis
@@ -36,4 +36,3 @@ experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-
