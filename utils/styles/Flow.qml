@@ -1,20 +1,20 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis labelsEnabled="0" styleCategories="Symbology|Labeling" version="3.6.1-Noosa">
-  <renderer-v2 type="singleSymbol" symbollevels="0" enableorderby="0" forceraster="0">
+<qgis styleCategories="Symbology|Labeling" labelsEnabled="0" version="3.6.1-Noosa">
+  <renderer-v2 forceraster="0" enableorderby="0" type="singleSymbol" symbollevels="0">
     <symbols>
-      <symbol alpha="1" type="line" clip_to_extent="1" name="0" force_rhr="0">
-        <layer pass="0" enabled="1" locked="0" class="SimpleLine">
-          <prop v="square" k="capstyle"/>
+      <symbol clip_to_extent="1" type="line" alpha="0.5" force_rhr="0" name="0">
+        <layer pass="0" class="SimpleLine" enabled="1" locked="0">
+          <prop v="flat" k="capstyle"/>
           <prop v="5;2" k="customdash"/>
           <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
           <prop v="MM" k="customdash_unit"/>
           <prop v="0" k="draw_inside_polygon"/>
-          <prop v="bevel" k="joinstyle"/>
+          <prop v="round" k="joinstyle"/>
           <prop v="0,0,0,255" k="line_color"/>
           <prop v="solid" k="line_style"/>
           <prop v="0.26" k="line_width"/>
           <prop v="MM" k="line_width_unit"/>
-          <prop v="0" k="offset"/>
+          <prop v="1.8" k="offset"/>
           <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
           <prop v="MM" k="offset_unit"/>
           <prop v="0" k="ring_filter"/>
@@ -34,11 +34,11 @@
             </Option>
           </data_defined_properties>
         </layer>
-        <layer pass="0" enabled="1" locked="0" class="MarkerLine">
+        <layer pass="0" class="MarkerLine" enabled="1" locked="0">
           <prop v="3" k="interval"/>
           <prop v="3x:0,0,0,0,0,0" k="interval_map_unit_scale"/>
           <prop v="MM" k="interval_unit"/>
-          <prop v="0" k="offset"/>
+          <prop v="1.8" k="offset"/>
           <prop v="0" k="offset_along_line"/>
           <prop v="3x:0,0,0,0,0,0" k="offset_along_line_map_unit_scale"/>
           <prop v="MM" k="offset_along_line_unit"/>
@@ -54,14 +54,14 @@
               <Option value="collection" type="QString" name="type"/>
             </Option>
           </data_defined_properties>
-          <symbol alpha="1" type="marker" clip_to_extent="1" name="@0@1" force_rhr="0">
-            <layer pass="0" enabled="1" locked="0" class="SimpleMarker">
+          <symbol clip_to_extent="1" type="marker" alpha="1" force_rhr="0" name="@0@1">
+            <layer pass="0" class="SimpleMarker" enabled="1" locked="0">
               <prop v="0" k="angle"/>
               <prop v="255,0,0,255" k="color"/>
               <prop v="1" k="horizontal_anchor_point"/>
               <prop v="bevel" k="joinstyle"/>
               <prop v="filled_arrowhead" k="name"/>
-              <prop v="0,0" k="offset"/>
+              <prop v="1,0" k="offset"/>
               <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
               <prop v="MM" k="offset_unit"/>
               <prop v="255,35,35,255" k="outline_color"/>
@@ -78,6 +78,11 @@
                 <Option type="Map">
                   <Option value="" type="QString" name="name"/>
                   <Option type="Map" name="properties">
+                    <Option type="Map" name="offset">
+                      <Option value="false" type="bool" name="active"/>
+                      <Option value="1" type="int" name="type"/>
+                      <Option value="" type="QString" name="val"/>
+                    </Option>
                     <Option type="Map" name="size">
                       <Option value="true" type="bool" name="active"/>
                       <Option value="2*coalesce(scale_exp(&quot;COUNT&quot;, 2, 82, 1, 10, 0.57), 0)" type="QString" name="expression"/>
@@ -96,6 +101,6 @@
     <sizescale/>
   </renderer-v2>
   <blendMode>0</blendMode>
-  <featureBlendMode>4</featureBlendMode>
+  <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>1</layerGeometryType>
 </qgis>

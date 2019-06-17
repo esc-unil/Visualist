@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Visualist: plugin for crime analysts &mdash; Visualist 0.1 documentation</title>
+  <title>Visualist: a spatial analysis plugin for crime analysts &mdash; Visualist 0.5 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.1
+                0.5
               </div>
             
           
@@ -87,7 +87,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Visualist: plugin for crime analysts</a></li>
+<li><a class="reference internal" href="#">Visualist: a spatial analysis plugin for crime analysts</a></li>
 <li><a class="reference internal" href="#aims">Aims</a></li>
 <li><a class="reference internal" href="#plugin-functionalities">Plugin functionalities</a></li>
 <li><a class="reference internal" href="#proportional-symbols-map">Proportional Symbols Map</a><ul>
@@ -95,29 +95,37 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#grid-map">Grid Map</a><ul>
-<li><a class="reference internal" href="#id1">Configuration</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#choropleth-map">Choropleth Map</a><ul>
 <li><a class="reference internal" href="#id2">Configuration</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#graduated-lines-map">Graduated Lines Map</a><ul>
+<li><a class="reference internal" href="#choropleth-map">Choropleth Map</a><ul>
 <li><a class="reference internal" href="#id3">Configuration</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#graduated-segmented-lines-map">Graduated Segmented Lines Map</a><ul>
+<li><a class="reference internal" href="#edge-map">Edge Map</a><ul>
 <li><a class="reference internal" href="#id4">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#flow-map">Flow Map</a><ul>
+<li><a class="reference internal" href="#id6">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#graduated-lines-map">Graduated Lines Map</a><ul>
+<li><a class="reference internal" href="#id7">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#graduated-segmented-lines-map">Graduated Segmented Lines Map</a><ul>
+<li><a class="reference internal" href="#id8">Configuration</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#nearest-neighbours-clusters-map">Nearest Neighbours Clusters Map</a><ul>
 <li><a class="reference internal" href="#explaination">Explaination</a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
-<li><a class="reference internal" href="#id7">Configuration</a></li>
+<li><a class="reference internal" href="#id11">Configuration</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spatial-autocorrelation-map">Spatial Autocorrelation Map</a><ul>
-<li><a class="reference internal" href="#id9">Configuration</a></li>
+<li><a class="reference internal" href="#id13">Configuration</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#k-nearest-neighbours-analysis">K-Nearest Neighbours analysis</a></li>
@@ -169,7 +177,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Visualist: plugin for crime analysts</li>
+      <li>Visualist: a spatial analysis plugin for crime analysts</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -188,26 +196,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="visualist-plugin-for-crime-analysts">
-<h1>Visualist: plugin for crime analysts<a class="headerlink" href="#visualist-plugin-for-crime-analysts" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="visualist-a-spatial-analysis-plugin-for-crime-analysts">
+<h1>Visualist: a spatial analysis plugin for crime analysts<a class="headerlink" href="#visualist-a-spatial-analysis-plugin-for-crime-analysts" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p>This is a python plugin for Quantum GIS 3 (<a class="reference external" href="https://qgis.org/">https://qgis.org/</a>) <a class="reference internal" href="#gis2019" id="id1"><span>[gis2019]</span></a></p>
 </div>
 <div class="section" id="aims">
 <span id="index-0"></span><h1>Aims<a class="headerlink" href="#aims" title="Permalink to this headline">¶</a></h1>
 <p>The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks,
 without the need for additional software, libraries, or complex workarounds.</p>
-<p>Some functionalities from the qGis 2.0 version have been removed.
-The following plugins are recommended:</p>
-<p><strong>Spreadsheet Layer</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/SpreadsheetLayers/">https://plugins.qgis.org/plugins/SpreadsheetLayers/</a>)
-Load layers from spreadsheet files (*.ods, *.xls, *.xlsx)</p>
-<p><strong>Load Them All</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/loadthemall/">https://plugins.qgis.org/plugins/loadthemall/</a>)
-Loads files stored in a directory structure recursively, based on several filters</p>
-<p>or</p>
-<p><strong>Layers menu from project</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/menu_from_project/">https://plugins.qgis.org/plugins/menu_from_project/</a>)
-Allow easy opening of layers maintaining their styles</p>
-<p>If you would like to report a bug, make suggestions for improving Visualist,
-or have a question aboutthe tools, please use: <a class="reference external" href="https://github.com/esc-unil/Visualist/issues">https://github.com/esc-unil/Visualist/issues</a></p>
+<p>If you use Visualist in a scientific publication, we recommand citations to the works cited in this webpage and we would appreciate the following reference:</p>
+<p>Rossy, Q. (2019) Visualist: a spatial analysis plugin for crime analysts. <em>Ecole des sciences criminelles</em>, Lausanne. <a class="reference external" href="https://plugins.qgis.org/plugins/visualist/">https://plugins.qgis.org/plugins/visualist/</a></p>
 </div>
 <div class="section" id="plugin-functionalities">
 <span id="index-1"></span><h1>Plugin functionalities<a class="headerlink" href="#plugin-functionalities" title="Permalink to this headline">¶</a></h1>
@@ -218,6 +218,8 @@ both quick and (I hope) functional.</p>
 <li><p>Proportional Symbols Map</p></li>
 <li><p>Grid Map</p></li>
 <li><p>Choropleth Map</p></li>
+<li><p>Edge Map</p></li>
+<li><p>Flow Map</p></li>
 <li><p>Graduated Lines Map</p></li>
 <li><p>Graduated Segmented Lines Map</p></li>
 <li><p>Nearest Neighbours Clusters Map</p></li>
@@ -227,6 +229,17 @@ both quick and (I hope) functional.</p>
 <ul class="simple">
 <li><p>K-Nearest neighbours analysis</p></li>
 </ul>
+<p>Some functionalities from the qGis 2.0 version have been removed.
+The following plugins are recommended:</p>
+<p><strong>Spreadsheet Layer</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/SpreadsheetLayers/">https://plugins.qgis.org/plugins/SpreadsheetLayers/</a>)
+Load layers from spreadsheet files (*.ods, *.xls, *.xlsx)</p>
+<p><strong>Load Them All</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/loadthemall/">https://plugins.qgis.org/plugins/loadthemall/</a>)
+Loads files stored in a directory structure recursively, based on several filters</p>
+<p>or</p>
+<p><strong>Layers menu from project</strong> (<a class="reference external" href="https://plugins.qgis.org/plugins/menu_from_project/">https://plugins.qgis.org/plugins/menu_from_project/</a>)
+Allow easy opening of layers maintaining their styles</p>
+<p>If you would like to report a bug, make suggestions for improving Visualist,
+or have a question about the tools, please use: <a class="reference external" href="https://github.com/esc-unil/Visualist/issues">https://github.com/esc-unil/Visualist/issues</a></p>
 </div>
 <div class="section" id="proportional-symbols-map">
 <h1>Proportional Symbols Map<a class="headerlink" href="#proportional-symbols-map" title="Permalink to this headline">¶</a></h1>
@@ -268,8 +281,8 @@ The program creates a layer of polygons (squares) whose size can be configured.
 Then the number of events present in each square is counted.</p>
 <p>The choice of the grid size can be guided by the <strong>average distance expected if the points were randomly distributed</strong>:</p>
 <p><cite>d = 0.5 * Square root of A/n where A = area and n = number of events</cite></p>
-<div class="section" id="id1">
-<h2>Configuration<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>Configuration<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p><strong>Points</strong></p>
 <blockquote>
 <div><p>The input points layer.</p>
@@ -297,7 +310,7 @@ Then the number of events present in each square is counted.</p>
 <a class="reference internal image-reference" href="_images/ChoroplethMap2.png"><img alt="_images/ChoroplethMap2.png" src="_images/ChoroplethMap2.png" style="width: 99%;" /></a>
 <p>Choropleth maps represent a quantity (number of events, percentages, etc.) by color (or pattern) for administrative areas.
 They allow values to be compared by region and demographic information to be used to weight measurements.</p>
-<table class="colwidths-given docutils align-center">
+<table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 67%" />
@@ -325,8 +338,8 @@ the number of inhabitants, dwellings, businesses.</p>
 the number of events (from a layer of points) contained in each zone is calculated.
 A new polygon layer containing a column storing the values is created.</p>
 <p>Be careful, these maps generate the perception that the distribution of events is uniform in each area.</p>
-<div class="section" id="id2">
-<h2>Configuration<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>Configuration<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p><strong>Polygons</strong></p>
 <blockquote>
 <div><p>The polygon layer to aggregate points.</p>
@@ -353,14 +366,111 @@ A new polygon layer containing a column storing the values is created.</p>
 </div></blockquote>
 </div>
 </div>
+<div class="section" id="edge-map">
+<h1>Edge Map<a class="headerlink" href="#edge-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/EdgeMap.png"><img alt="_images/EdgeMap.png" src="_images/EdgeMap.png" style="width: 99%;" /></a>
+<p>The edge map reprents the edges between start and end points.</p>
+<p>This script is based upon the work of:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Anita Graser</strong> : <a class="reference external" href="http://planet.qgis.org/planet/tag/flows/">http://planet.qgis.org/planet/tag/flows/</a></p></li>
+<li><p><strong>Alexander Bruy</strong> : PointsToPaths.py script available in QGis</p></li>
+</ul>
+</div></blockquote>
+<p>The operation is quite simple.
+The program creates a layer of lines from points grouped by a shared value (i.e. an id of the link).
+All edges sharing the same starting and ending points are grouped.
+A point layer is also created to represent the number of events starting (orange) and ending (blue) at each node.</p>
+<div class="section" id="id4">
+<h2>Configuration<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p><strong>Points</strong></p>
+<blockquote>
+<div><p>The input points layer.</p>
+</div></blockquote>
+<p><strong>Group field</strong></p>
+<blockquote>
+<div><p>Parameter to identify the points belonging to the same edge.</p>
+</div></blockquote>
+<p><strong>Order field</strong></p>
+<blockquote>
+<div><p>Number parameter to define the order of the sequence.</p>
+</div></blockquote>
+<p><strong>Order date format [optional]</strong></p>
+<blockquote>
+<div><p>Optional parameter if a string datetime parameter is used as order field. Leave blank, if Order field is already a datetime field or a number.</p>
+</div></blockquote>
+<p><strong>Fields to include [optional]</strong></p>
+<blockquote>
+<div><p>Multiple selection of fields to copy. <em>start_</em> and <em>end_</em> prefixes are used in the output for each field.</p>
+</div></blockquote>
+<p><strong>Edges</strong></p>
+<blockquote>
+<div><p>Output: a new line layer with selected fields and a count field.</p>
+</div></blockquote>
+<p><strong>End points</strong></p>
+<blockquote>
+<div><p>Output: a new point layer with selected fields and three count fields (total, in and out).</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="flow-map">
+<h1>Flow Map<a class="headerlink" href="#flow-map" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/FlowMap.png"><img alt="_images/FlowMap.png" src="_images/FlowMap.png" style="width: 99%;" /></a>
+<p>The flow map reprents the grouped flows of edges (e.g. created with the edge map algorithm, see above).
+This script is based upon the work of <strong>Anita Graser</strong>:</p>
+<p><a class="reference external" href="http://planet.qgis.org/planet/tag/flows/">http://planet.qgis.org/planet/tag/flows/</a></p>
+<p>code avaible at <a class="reference external" href="https://github.com/dts-ait/qgis-edge-bundling">https://github.com/dts-ait/qgis-edge-bundling</a></p>
+<p>If you use this script in scientific publication, please cite <a class="reference internal" href="#gra2017" id="id5"><span>[gra2017]</span></a>:</p>
+<p>Graser, A., Schmidt, J., Roth, F., &amp; Brändle, N. (2017 online) Untangling Origin-Destination Flows in Geographic Information Systems. Information Visualization - Special Issue on Visual Movement Analytics. doi:10.1177/1473871617738122.</p>
+<p>URL: <a class="reference external" href="http://journals.sagepub.com/doi/full/10.1177/1473871617738122">http://journals.sagepub.com/doi/full/10.1177/1473871617738122</a></p>
+<div class="section" id="id6">
+<h2>Configuration<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p><strong>Edges</strong></p>
+<blockquote>
+<div><p>The input lines layer. If the input contains paths, the explode algorithm while split path in edges.</p>
+</div></blockquote>
+<p><strong>Cluster field [optional]</strong></p>
+<blockquote>
+<div><p>Parameter to group lines. Use the K-mean clustering algorithm from QGis for instance. If no clusters are defined, the algorithm is slower.</p>
+</div></blockquote>
+<p><strong>Initial step size</strong></p>
+<blockquote>
+<div><p>Depend upon the coordinate system. For instance, you may try 0.001 or 0.01 for GPS data, or 100 for projected data.</p>
+</div></blockquote>
+<p><strong>Compatibility</strong></p>
+<blockquote>
+<div><p>From 0 to 1 : defines how many lines are grouped. A <em>low</em> value increases the grouping of paths.</p>
+</div></blockquote>
+<p><strong>Cycles</strong></p>
+<blockquote>
+<div><p>Parameter that increases the number of line breaks.</p>
+</div></blockquote>
+<p><strong>Iterations</strong></p>
+<blockquote>
+<div><p>Number of iterations of the force-directed layout.</p>
+</div></blockquote>
+<p><strong>Maximum distance [optional]</strong></p>
+<blockquote>
+<div><p>Parameter used to merge overlapping segments. Depend upon the coordinate system.</p>
+</div></blockquote>
+<p><strong>Weight field [optional]</strong></p>
+<blockquote>
+<div><p>If maxium distance is set, a weight can be used to sum overlapping weights. For instance, the field may contains the number of events for each lines.</p>
+</div></blockquote>
+<p><strong>Flow Map</strong></p>
+<blockquote>
+<div><p>Output: a new line layer.</p>
+</div></blockquote>
+</div>
+</div>
 <div class="section" id="graduated-lines-map">
 <h1>Graduated Lines Map<a class="headerlink" href="#graduated-lines-map" title="Permalink to this headline">¶</a></h1>
 <a class="reference internal image-reference" href="_images/GraduatedLineWithoutSegmentation2.png"><img alt="_images/GraduatedLineWithoutSegmentation2.png" src="_images/GraduatedLineWithoutSegmentation2.png" style="width: 99%;" /></a>
 <p>Graduated line maps represent the number of events along roads (polyline layer).
 Events are projected onto the segments closest to their positions,
 but only if the distance between them is less than a configurable threshold (e. g. 50 meters).</p>
-<div class="section" id="id3">
-<h2>Configuration<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h2>Configuration<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p><strong>Lines</strong></p>
 <blockquote>
 <div><p>The input lines layer to aggregate points.</p>
@@ -398,8 +508,8 @@ The algorithm starts by dividing the roads into segments whose length can be con
 The segment closest to each point is then identified.
 Events are projected onto the segments closest to their positions,
 but only if the distance between them is less than a configurable threshold (e. g. 50 meters).</p>
-<div class="section" id="id4">
-<h2>Configuration<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h2>Configuration<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p><strong>Lines</strong></p>
 <blockquote>
 <div><p>The input lines layer to aggregate points.</p>
@@ -437,7 +547,7 @@ points linked to a line (in green) and points not linked to a line (in red).</p>
 <h1>Nearest Neighbours Clusters Map<a class="headerlink" href="#nearest-neighbours-clusters-map" title="Permalink to this headline">¶</a></h1>
 <a class="reference internal image-reference" href="_images/NearNeighborsMap2.png"><img alt="_images/NearNeighborsMap2.png" src="_images/NearNeighborsMap2.png" style="width: 99%;" /></a>
 <p>The map shows the hotspots identified by the analysis of the closest neighbours.
-This algorithm is a simplified version of Ned Levine’s algorithm <a class="reference internal" href="#ned2015" id="id5"><span>[ned2015]</span></a> in
+This algorithm is a simplified version of Ned Levine’s algorithm <a class="reference internal" href="#ned2015" id="id9"><span>[ned2015]</span></a> in
 CrimeStat: <a class="reference external" href="http://nij.gov/topics/technology/maps/pages/crimestat.aspx">http://nij.gov/topics/technology/maps/pages/crimestat.aspx</a>.</p>
 <div class="section" id="explaination">
 <h2>Explaination<a class="headerlink" href="#explaination" title="Permalink to this headline">¶</a></h2>
@@ -460,7 +570,7 @@ change groups if two hotspots are spatially close.</p>
 <p>4. The convex envelope of each cluster is used to
 represent the hot points by polygons.</p>
 </div></blockquote>
-<p>Unlike Ned Levine’s algorithm in CrimeStat (Nearest Neighbour Hierarchical Clustering) <a class="reference internal" href="#ned2015" id="id6"><span>[ned2015]</span></a>,
+<p>Unlike Ned Levine’s algorithm in CrimeStat (Nearest Neighbour Hierarchical Clustering) <a class="reference internal" href="#ned2015" id="id10"><span>[ned2015]</span></a>,
 the map represents only first-order clusters.</p>
 </div>
 <div class="section" id="examples">
@@ -476,8 +586,8 @@ In addition, the quantities directly represent the number of events that occurre
 the aggregation is defined by the size of the grid and the position of the total area.
 On a grid map, the origin of the grid changes the representation.</p>
 </div>
-<div class="section" id="id7">
-<h2>Configuration<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id11">
+<h2>Configuration<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <p><strong>Points</strong></p>
 <blockquote>
 <div><p>The input points layer.</p>
@@ -510,10 +620,10 @@ On a grid map, the origin of the grid changes the representation.</p>
 <a class="reference internal image-reference" href="_images/LisaLocalMoranCotypes.png"><img alt="_images/LisaLocalMoranCotypes.png" src="_images/LisaLocalMoranCotypes.png" style="width: 49%;" /></a>
 <p>Analysis of local spatial autocorrelation statistics.
 The plugin cover the Local Moran’s I <em>(Clusters and Outliers Analysis)</em>, and Getis-Ord Gi* <em>(Hot-Spot Analysis)</em> statistics.</p>
-<p>These maps are generated with PySAL: Python Spatial Analysis Library from Rey, S.J. and L. Anselin <a class="reference internal" href="#ran2010" id="id8"><span>[ran2010]</span></a></p>
+<p>These maps are generated with PySAL: Python Spatial Analysis Library from Rey, S.J. and L. Anselin <a class="reference internal" href="#ran2010" id="id12"><span>[ran2010]</span></a></p>
 <p>see: <a class="reference external" href="https://geodacenter.github.io/workbook/6a_local_auto/lab6a.html">https://geodacenter.github.io/workbook/6a_local_auto/lab6a.html</a></p>
-<div class="section" id="id9">
-<h2>Configuration<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id13">
+<h2>Configuration<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
 <p><strong>Polygons</strong></p>
 <blockquote>
 <div><p>The input polygons layer.</p>
@@ -569,10 +679,16 @@ A Nearest Neighbour Index (NNI) plot is also calculated.</p>
 <div class="section" id="references">
 <h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
 <dl class="citation">
-<dt class="label" id="ned2015"><span class="brackets">ned2015</span><span class="fn-backref">(<a href="#id5">1</a>,<a href="#id6">2</a>)</span></dt>
+<dt class="label" id="gis2019"><span class="brackets"><a class="fn-backref" href="#id1">gis2019</a></span></dt>
+<dd><p>Development Team (2019). Quantum GIS geographic information system. Open Source Geospatial Foundation Project</p>
+</dd>
+<dt class="label" id="gra2017"><span class="brackets"><a class="fn-backref" href="#id5">gra2017</a></span></dt>
+<dd><p>GRASER, A., SCHMIDT, J., ROTH, F., &amp; BRÄNDLE, N. (2017 online) Untangling Origin-Destination Flows in Geographic Information Systems. Information Visualization - Special Issue on Visual Movement Analytics. doi:10.1177/1473871617738122. URL: http://journals.sagepub.com/doi/full/10.1177/1473871617738122</p>
+</dd>
+<dt class="label" id="ned2015"><span class="brackets">ned2015</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id10">2</a>)</span></dt>
 <dd><p>LEVINE, Ned (2015). CrimeStat: A Spatial Statistics Program for the Analysis of Crime Incident Locations (v 4.02). Ned Levine &amp; Associates, Houston, Texas, and the National Institute of Justice, Washington, D.C. August.</p>
 </dd>
-<dt class="label" id="ran2010"><span class="brackets"><a class="fn-backref" href="#id8">ran2010</a></span></dt>
+<dt class="label" id="ran2010"><span class="brackets"><a class="fn-backref" href="#id12">ran2010</a></span></dt>
 <dd><p>REY, Sergio J. &amp; ANSELIN, Luc. (2010). PySAL: A Python library of spatial analytical methods. In : Handbook of applied spatial analysis. Springer, Berlin, Heidelberg, 2010. p. 175-193.</p>
 </dd>
 </dl>

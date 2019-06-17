@@ -115,12 +115,8 @@ class EdgeCluster():
         self.epm_x = np.zeros(shape=(self.E,self.N))                # Bundles edges (x-values)
         self.epm_y = np.zeros(shape=(self.E,self.N))                # Bundles edges (y-values)
 
-        self.index = QgsSpatialIndex()
-        for e in self.edges:
-            self.index.insertFeature(e)
-        self.allfeatures = {edge.id(): edge for (edge) in self.edges}
-        self.segment_id = 0
-        self.segments = {}
+        self.segments = {} # dict of Edges containing {id_seg: seg}
+        self.allSegments = {} # {id_seg: [seg as Edge, MainEdge id]}
 
     def get_size(self):
         return len(self.edges)
@@ -128,21 +124,27 @@ class EdgeCluster():
     def get_segments(self, edge):
         return self.segments[edge.id()]
 
-    def create_segments(self, feedback):
-        for edge in self.edges:
+    def create_segments(self, weight_index, feedback):
+        self.index = QgsSpatialIndex()
+        seg_id = 0
+        for i, edge in enumerate(self.edges):
             if feedback.isCanceled(): return
+            feedback.setProgress(100.0*(i+1)/len(self.edges))
             geom = edge.geometry()
             attrs = edge.attributes()
             polyline = geom.asPolyline()
-            feat = QgsFeature()
             segments = {}
             for j in range(0,len(polyline)-1):
+                feat = QgsFeature()
+                feat.setId(seg_id)
+                seg_id += 1
                 g = QgsGeometry.fromPolylineXY([polyline[j],polyline[j+1]])
                 feat.setGeometry(g)
                 feat.setAttributes(attrs+[j]) #Add the rank of the segment
-                feat.setId(self.segment_id)
-                self.segment_id += 1
-                segments[self.segment_id] = Edge(feat)
+                segEdge = Edge(feat, weight_index)
+                self.allSegments[segEdge.id()] = [segEdge, edge.id()]
+                self.index.addFeature(segEdge)
+                segments[segEdge.id()] = segEdge
             self.segments[edge.id()] = segments
 
     def collapse_lines(self, max_distance, feedback):
@@ -154,23 +156,29 @@ class EdgeCluster():
                 geom1 = segment1.geometry()
                 # get other edges in the vicinty
                 tolerance = min(max_distance,geom1.length()/2)
-                tolerance = max_distance
                 ids = self.index.intersects(geom1.buffer(tolerance,4).boundingBox())
+                # feedback.setProgressText("{0} matching segments with tolerance of {1}".format(len(ids), tolerance))
+                keys2pop = []
                 for id in ids:
-                    edge2 = self.allfeatures[id]
-                    if edge1.id()!=edge2.id():
-                        segments2 = self.get_segments(edge2)
-                        key_to_pop = []
-                        for key2, segment2 in segments2.items():
-                            geom2 = segment2.geometry()
-                            d0 = geom1.vertexAt(0).distance(geom2.vertexAt(0))
-                            d1 = geom1.vertexAt(1).distance(geom2.vertexAt(1))
-                            distance = d0 + d1
-                            if d0 <= (tolerance/2) and d1 <= (tolerance/2):
-                                segment1.increase_weight(segment2.get_weight())
-                                key_to_pop.append(key2)
-                        for key_pop in key_to_pop:
-                            segments2.pop(key_pop)
+                    edge2_id = self.allSegments[id][1]
+                    if edge2_id == edge1.id(): continue
+                    segment2 = self.allSegments[id][0]
+                    geom2 = segment2.geometry()
+                    d0 = geom1.vertexAt(0).distance(geom2.vertexAt(0))
+                    d1 = geom1.vertexAt(1).distance(geom2.vertexAt(1))
+                    if d0 <= (tolerance/2) and d1 <= (tolerance/2):
+                        segment1.increase_weight(segment2.get_weight())
+                        keys2pop.append(id)
+                    d0 = geom1.vertexAt(0).distance(geom2.vertexAt(1))
+                    d1 = geom1.vertexAt(1).distance(geom2.vertexAt(0))
+                    if d0 <= (tolerance/2) and d1 <= (tolerance/2):
+                        segment1.increase_weight(segment2.get_weight())
+                        keys2pop.append(id)
+                for id in keys2pop:
+                    self.index.deleteFeature(self.allSegments[id][0])
+                    self.segments[self.allSegments[id][1]].pop(id)
+                    self.allSegments.pop(id)
+
 
     def compute_compatibilty_matrix(self, feedback):
         """
@@ -192,7 +200,6 @@ class EdgeCluster():
             self.edge_lengths.append(edges_as_vect[e_idx].length())
 
         progress = 0
-
         for i in range(self.E-1):
             if feedback.isCanceled(): return
             feedback.setProgress(100.0*(i+1)/(self.E-1))
@@ -280,6 +287,7 @@ class EdgeCluster():
             self.epm_y[e_idx, self.N-1] = vertices[1].y()
 
         # For each cycle
+        feedback.setProgressText('Compute force-directed layout')
         for c in range(self.cycles):
             if feedback.isCanceled(): return
             # New number of subdivision points
@@ -318,7 +326,7 @@ class EdgeCluster():
             # For all iterations (number decreased in every cycle)
             for iteration in range(self.I):
                 if feedback.isCanceled(): return
-                if self.I % 5 == 0:
+                if (iteration+1) % 5 == 0:
                     feedback.pushCommandInfo("Cycle {0} and Iteration {1}".format(c+1, iteration+1))
                     feedback.setProgress(100.0*(iteration+1)/self.I)
                 # Spring forces

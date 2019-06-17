@@ -30,7 +30,7 @@ __revision__ = '$Format:%H$'
 import os
 from datetime import datetime
 from qgis.PyQt.QtCore import QVariant, QDateTime
-
+from qgis.PyQt.QtGui import QColor
 from qgis.core import (QgsFeature,
                        QgsFeatureSink,
                        QgsFields,
@@ -49,10 +49,13 @@ from qgis.core import (QgsFeature,
                        QgsProcessing,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFolderDestination,
-                       QgsMessageLog)
+                       QgsMessageLog,
+                       QgsProcessingMultiStepFeedback,
+                       QgsProcessingUtils)
 
 from processing.algs.qgis.QgisAlgorithm import QgisAlgorithm
 from .visualist_alg import VisualistAlgorithm
+from .utils import renderers
 
 #Convenient function to debug
 NAME = "Visualist"
@@ -65,8 +68,8 @@ class PointsToEdge(VisualistAlgorithm):
     ORDER_FIELD = 'ORDER_FIELD'
     FIELDS = 'FIELDS'
     DATE_FORMAT = 'DATE_FORMAT'
-    OUTPUT = 'OUTPUT'
-    OUTPUT_TEXT_DIR = 'OUTPUT_TEXT_DIR'
+    OUTPUT_LINE = 'OUTPUT_LINE'
+    OUTPUT_POINT = 'OUTPUT_POINT'
 
     def __init__(self):
         super().__init__()
@@ -78,22 +81,27 @@ class PointsToEdge(VisualistAlgorithm):
         self.addParameter(QgsProcessingParameterFeatureSource(self.INPUT,
                                                               self.tr('Input point layer'), [QgsProcessing.TypeVectorPoint]))
         self.addParameter(QgsProcessingParameterField(self.GROUP_FIELD,
-                                                      self.tr('Group field'), parentLayerParameterName=self.INPUT, optional=True))
+                                                      self.tr('Group field'), parentLayerParameterName=self.INPUT))
         self.addParameter(QgsProcessingParameterField(self.ORDER_FIELD,
                                                       self.tr('Order field'), parentLayerParameterName=self.INPUT))
         self.addParameter(QgsProcessingParameterString(self.DATE_FORMAT,
                                                        self.tr('Order date format (i.e. %Y-%m-%dT%H:%M:%S.%f)'), optional=True))
         self.addParameter(QgsProcessingParameterField(self.FIELDS,
-                                                      self.tr('Fields to include (leave empty to use all fields)'),
+                                                      self.tr('Fields to include'),
                                                       parentLayerParameterName=self.INPUT,
                                                       allowMultiple=True, optional=True))
-        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, self.tr('Edges'), QgsProcessing.TypeVectorLine))
+        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_LINE,
+                                                        self.tr('Edges'),
+                                                        QgsProcessing.TypeVectorLine))
+        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_POINT,
+                                                        self.tr('End points'),
+                                                        QgsProcessing.TypeVectorPoint))
 
-
-    def addFields(self, source, fields, prefix, field_names, order_field_def):
-        order_field = QgsField(order_field_def)
-        order_field.setName(prefix)
-        fields.append(order_field)
+    def addFields(self, source, fields, prefix, field_names, order_field_def=None):
+        if order_field_def is not None:
+            order_field = QgsField(order_field_def)
+            order_field.setName(prefix)
+            fields.append(order_field)
         self.field_indices = []
         for field_name in field_names:
             field_index = source.fields().lookupField(field_name)
@@ -106,7 +114,8 @@ class PointsToEdge(VisualistAlgorithm):
             fields.append(field)
             self.field_indices.append(field_index)
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(self, parameters, context, model_feedback):
+        feedback = QgsProcessingMultiStepFeedback(2, model_feedback)
         source = self.parameterAsSource(parameters, self.INPUT, context)
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
@@ -124,6 +133,7 @@ class PointsToEdge(VisualistAlgorithm):
             group_field_def = None
         order_field_def = source.fields().at(order_field_index)
 
+        #Create output for lines
         fields = QgsFields()
         self.addFields(source, fields, 'start_order', field_names, order_field_def)
         self.addFields(source, fields, 'end_order', field_names, order_field_def)
@@ -135,22 +145,34 @@ class PointsToEdge(VisualistAlgorithm):
         if QgsWkbTypes.hasZ(source.wkbType()):
             output_wkb = QgsWkbTypes.addZ(output_wkb)
 
-        (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT, context,
-                                               fields, output_wkb, source.sourceCrs())
-        if sink is None:
-            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        (self.sink, self.dest_id) = self.parameterAsSink(parameters, self.OUTPUT_LINE, context,
+                                                fields, output_wkb, source.sourceCrs())
+        if self.sink is None:
+            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT_LINE))
 
+        #Create output for Points
+        fields_point = QgsFields()
+        fields_point.append(QgsField("fid", QVariant.Int, "int", 9, 0))
+        self.addFields(source, fields_point, 'end_order', field_names)
+        fields_point.append(QgsField("COUNT", QVariant.LongLong))
+        fields_point.append(QgsField("COUNT_IN", QVariant.LongLong))
+        fields_point.append(QgsField("COUNT_OUT", QVariant.LongLong))
+
+        (self.sink_point, self.dest_id_point) = self.parameterAsSink(parameters, self.OUTPUT_POINT, context,
+                                               fields_point, source.wkbType(), source.sourceCrs(), QgsFeatureSink.RegeneratePrimaryKey)
+        if self.sink_point is None:
+            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT_POINT))
+
+        #Compute the lines
         points = dict()
         features = source.getFeatures(QgsFeatureRequest(), QgsProcessingFeatureSource.FlagSkipGeometryValidityChecks)
         total = 100.0 / source.featureCount() if source.featureCount() else 0
         for current, f in enumerate(features):
-            if feedback.isCanceled():
-                return {}
+            if feedback.isCanceled(): return {}
 
-            if not f.hasGeometry():
-                continue
+            if not f.hasGeometry(): continue
 
-            point = f.geometry().constGet().clone()
+            point = f.geometry().asPoint()
             if group_field_index >= 0:
                 group = f[group_field_index]
             else:
@@ -174,18 +196,25 @@ class PointsToEdge(VisualistAlgorithm):
                 points[group] = [data]
 
             feedback.setProgress(int(current * total))
+        feedback.setCurrentStep(1)
 
-        feedback.setProgress(0)
+        #Create the features
         current = 0
         total = 100.0 / len(points) if points else 1
         edge_ids = {}
+        end_points = {}
+        self.point_id = 0
         for group, vertices in points.items():
-            if feedback.isCanceled():
-                break
+            if feedback.isCanceled(): return {}
+            feedback.setProgress(int(current * total))
             # log("attrs: {}".format(vertices))
             vertices.sort(key=lambda x: (x[0] is None, x[0]))
             for i in range(len(vertices)-1):
-                edge_id = vertices[i][1].asWkt()+"-"+vertices[i+1][1].asWkt()
+                if feedback.isCanceled(): return {}
+                start_id = vertices[i][1].asWkt()
+                end_id = vertices[i+1][1].asWkt()
+                edge_id = start_id+"-"+end_id
+
                 if edge_id in edge_ids:
                     f = edge_ids[edge_id]
                     count_index = 2*(len(self.field_indices)+1)
@@ -193,21 +222,76 @@ class PointsToEdge(VisualistAlgorithm):
                     f.setAttribute(count_index,count)
                 else:
                     f = QgsFeature()
-                    attributes = []
-                    attributes.append(vertices[i][0])               #Add Order begin
+                    attrs = []
+                    attrs.append(vertices[i][0])               #Add Order begin
                     for j in range(len(self.field_indices)):        #Add Attrs for begin
-                        attributes.append(vertices[i][j+2])         # +2 ignore order and point
-                    attributes.append(vertices[i+1][0])             #Add Order end
+                        attrs.append(vertices[i][j+2])         # +2 ignore order and point
+                    attrs.append(vertices[i+1][0])             #Add Order end
                     for j in range(0, len(self.field_indices)):     #Add Attrs for end
-                        attributes.append(vertices[i+1][j+2])       # +2 ignore order and point
-                    attributes.append(1)                            #Count = 1
-                    f.setAttributes(attributes)
+                        attrs.append(vertices[i+1][j+2])       # +2 ignore order and point
+                    attrs.append(1)  #Count = 1
+                    f.setAttributes(attrs)
                     line = [vertices[i][1], vertices[i+1][1]]
-                    f.setGeometry(QgsGeometry(QgsLineString(line)))
+                    geom = QgsGeometry()
+                    f.setGeometry(QgsGeometry(geom.fromPolylineXY(line)))
                     edge_ids[edge_id] = f
+
+                self.updatePoints(start_id, end_points, vertices[i], 'start')
+                self.updatePoints(end_id, end_points, vertices[i+1], 'end')
+
                 current += 1
                 feedback.setProgress(int(current * total))
         for id in edge_ids:
-            sink.addFeature(edge_ids[id], QgsFeatureSink.FastInsert)
+            if feedback.isCanceled(): return {}
+            self.sink.addFeature(edge_ids[id], QgsFeatureSink.FastInsert)
+        for id in end_points:
+            if feedback.isCanceled(): return {}
+            self.sink_point.addFeature(end_points[id], QgsFeatureSink.FastInsert)
 
-        return {self.OUTPUT: dest_id}
+        return {self.OUTPUT_LINE: self.dest_id}
+
+    def updatePoints(self, id, end_points, vertice, type):
+        if id in end_points:
+            f_point = end_points[id]
+            count_index = (len(self.field_indices)+1)
+            count = f_point.attribute(count_index)+1
+            f_point.setAttribute(count_index,count)
+            if type == 'start':
+                count_index = (len(self.field_indices)+3)
+                count = f_point.attribute(count_index)+1
+                f_point.setAttribute(count_index,count)
+            else:
+                count_index = (len(self.field_indices)+2)
+                count = f_point.attribute(count_index)+1
+                f_point.setAttribute(count_index,count)
+        else:
+            f_point = QgsFeature()
+            attrs_point = [self.point_id]
+            for j in range(0, len(self.field_indices)):
+                attrs_point.append(vertice[j+2])
+            if type == 'start':
+                attrs_point += [1,0,1]
+            else:
+                attrs_point += [1,1,0]
+            f_point.setAttributes(attrs_point)
+            geom = QgsGeometry()
+            f_point.setGeometry(geom.fromPointXY(vertice[1]))
+            end_points[id] = f_point
+            self.point_id += 1
+
+    def postProcessAlgorithm(self, context, feedback):
+        """
+        PostProcessing Tasks to define the Symbology
+        """
+        output = QgsProcessingUtils.mapLayerFromString(self.dest_id_point, context)
+        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "utils/styles/EdgesPoints.qml")
+        feedback.pushInfo('Load symbology from file: {})'.format(path))
+        output.loadNamedStyle(path)
+        output.triggerRepaint()
+
+        output = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
+        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "utils/styles/Edges.qml")
+        feedback.pushInfo('Load symbology from file: {})'.format(path))
+        output.loadNamedStyle(path)
+        output.triggerRepaint()
+        return {self.OUTPUT_LINE: self.dest_id}

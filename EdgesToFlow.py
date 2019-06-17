@@ -78,38 +78,16 @@ class EdgesToFlow(VisualistAlgorithm):
     def name(self):
         return "flowmap"
 
-    def postProcessAlgorithm(self, context, feedback):
-        """
-        PostProcessing Tasks to define the Symbology
-        """
-        output = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
-        if self.doRenderer:
-            r = renderers.MapRender(output)
-            r.prop('OVERLAP_COUNT', type=renderers.LINE)
-
-        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "utils/styles/Flow.qml")
-        feedback.pushInfo('Load symbology from file: {})'.format(path))
-        output.loadNamedStyle(path)
-        output.triggerRepaint()
-        return {self.OUTPUT: self.dest_id}
-
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(
             self.INPUT,
-            self.tr("Input layer"),
+            self.tr("Edges"),
             [QgsProcessing.TypeVectorLine]))
 
 
         self.addParameter(QgsProcessingParameterField(
             self.CLUSTER_FIELD,
             self.tr("Cluster field"),
-            type=QgsProcessingParameterField.Any,
-            parentLayerParameterName=self.INPUT,
-            allowMultiple=False, defaultValue=None, optional=True))
-
-        self.addParameter(QgsProcessingParameterField(
-            self.WEIGHT_FIELD,
-            self.tr("Weight field"),
             type=QgsProcessingParameterField.Any,
             parentLayerParameterName=self.INPUT,
             allowMultiple=False, defaultValue=None, optional=True))
@@ -150,9 +128,18 @@ class EdgesToFlow(VisualistAlgorithm):
             self.MAX_DISTANCE,
             self.tr("Maximum distance to merge overlapping segments"),
             type=QgsProcessingParameterNumber.Double,
-            optional=True) #defaultValue=0.005,
+            defaultValue=0.0005, optional=True) #defaultValue=0.005,
         max_dist.setFlags(max_dist.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(max_dist)
+
+        weight = QgsProcessingParameterField(
+            self.WEIGHT_FIELD,
+            self.tr("Weight field"),
+            type=QgsProcessingParameterField.Any,
+            parentLayerParameterName=self.INPUT,
+            allowMultiple=False, defaultValue=None, optional=True)
+        weight.setFlags(weight.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        self.addParameter(weight)
 
         self.addParameter(QgsProcessingParameterFeatureSink(
             self.OUTPUT,
@@ -162,9 +149,10 @@ class EdgesToFlow(VisualistAlgorithm):
     def processAlgorithm(self, parameters, context, model_feedback):
         # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
         # overall progress through the model
-        feedback = QgsProcessingMultiStepFeedback(3, model_feedback)
+        feedback = QgsProcessingMultiStepFeedback(4, model_feedback)
         outputs = {}
         self.doRenderer = False
+        feedback.setProgressText(self.tr('Preprocessing input (fix geometries, explode lines and remove null geometries)'))
         # Fix geometries
         alg_params = {
             'INPUT': parameters[self.INPUT],
@@ -196,14 +184,23 @@ class EdgesToFlow(VisualistAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        weight_field = self.parameterAsString(parameters, self.WEIGHT_FIELD, context)
+        source = self.parameterAsSource(outputs['RemoveNullGeometries'], 'OUTPUT', context)
+        fields = source.fields()
+
         cluster_field = self.parameterAsString(parameters, self.CLUSTER_FIELD, context)
-        initial_step_size = self.parameterAsDouble(parameters, self.INITIAL_STEP_SIZE, context)
-        max_distance = self.parameterAsDouble(parameters, self.MAX_DISTANCE, context)
         compatibility = self.parameterAsDouble(parameters, self.COMPATIBILITY, context)
         cycles = self.parameterAsInt(parameters, self.CYCLES, context)
         iterations = self.parameterAsInt(parameters, self.ITERATIONS, context)
-        source = self.parameterAsSource(outputs['RemoveNullGeometries'], 'OUTPUT', context)
+        initial_step_size = self.parameterAsDouble(parameters, self.INITIAL_STEP_SIZE, context)
+        max_distance = self.parameterAsDouble(parameters, self.MAX_DISTANCE, context)
+        self.max_distance = max_distance
+        weight_field = self.parameterAsString(parameters, self.WEIGHT_FIELD, context)
+        weight_field_index = None
+        if weight_field != '':
+            weight_field_index = fields.lookupField(weight_field)
+
+
+
 
         # Create edge list
         features = source.getFeatures(QgsFeatureRequest())
@@ -211,10 +208,9 @@ class EdgesToFlow(VisualistAlgorithm):
         edges = []
         for current, feat in enumerate(features):
             if feedback.isCanceled(): break
-            edges.append(Edge(feat))
+            edges.append(Edge(feat, weight_field_index))
 
         # Create clusters
-        fields = source.fields()
         clusters = []
         if cluster_field != '':
             # Arrange edges in clusters according to cluster-id
@@ -258,8 +254,10 @@ class EdgesToFlow(VisualistAlgorithm):
                 if feedback.isCanceled(): return {}
                 if cl.E > 1:
                     cl.force_directed_eb(feedback)
+            feedback.setCurrentStep(3)
             for id, cl in enumerate(clusters):
                 if feedback.isCanceled(): return {}
+                feedback.setProgress(100.0*id/len(clusters))
                 for e, edge in enumerate(cl.edges):
                     feat = QgsFeature()
                     feat.setGeometry(edge.geometry())
@@ -273,9 +271,13 @@ class EdgesToFlow(VisualistAlgorithm):
                 if feedback.isCanceled(): return {}
                 if cl.E > 1:
                     cl.force_directed_eb(feedback)
-                    cl.create_segments(feedback)
-                    feedback.setCurrentStep(2)
-                    cl.collapse_lines(max_distance, feedback)
+            feedback.setCurrentStep(3)
+            for id, cl in enumerate(clusters):
+                if feedback.isCanceled(): return {}
+                feedback.setProgressText("Segment lines for cluster {0}".format(id))
+                cl.create_segments(weight_field_index, feedback)
+                feedback.setProgressText("Collapse lines for cluster {0}".format(id))
+                cl.collapse_lines(max_distance, feedback)
             fid = 0
             for id, cl in enumerate(clusters):
                 if feedback.isCanceled(): return {}
@@ -293,5 +295,21 @@ class EdgesToFlow(VisualistAlgorithm):
                         feat.setAttributes(attr)
                         sink.addFeature(feat, QgsFeatureSink.FastInsert)
                         fid += 1
+
+        return {self.OUTPUT: self.dest_id}
+
+    def postProcessAlgorithm(self, context, feedback):
+        """
+        PostProcessing Tasks to define the Symbology
+        """
+        output = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
+        if self.max_distance == 0:
+            path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "utils/styles/Flow.qml")
+            feedback.pushInfo('Load symbology from file: {})'.format(path))
+            output.loadNamedStyle(path)
+            output.triggerRepaint()
+        else:
+            r = renderers.MapRender(output)
+            r.prop('OVERLAP_COUNT', type=renderers.LINE, trans=1)
 
         return {self.OUTPUT: self.dest_id}
