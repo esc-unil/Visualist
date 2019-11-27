@@ -219,7 +219,7 @@ class EdgesToFlow(VisualistAlgorithm):
                 if feedback.isCanceled(): return {}
                 labels.append(edge[cluster_field])
             feedback.pushDebugInfo(cluster_field)
-            for l in range(0, max(labels) + 1):
+            for l in range(0, len(labels) + 1):
                 if feedback.isCanceled(): return {}
                 clusters.append(list())
             for i, label in enumerate(labels):

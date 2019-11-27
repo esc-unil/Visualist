@@ -572,7 +572,7 @@ To extract the data: open the output HTML file (in the results viewer) and click
 Acknowledgements
 =================
 
-This 3.0 version was created with Plugin Builder
+This 3.0 version was created with Plugin Builder (http://g-sherman.github.io/Qgis-Plugin-Builder/)
 
 It integrates:
 
@@ -580,8 +580,11 @@ It integrates:
 
 -  functionalities inspired from Victor Olaya's processing plugins (https://github.com/volaya?tab=repositories)
 
+-  functionalities inspired from Anita Graser's scripts (http://planet.qgis.org/planet/tag/flows/)
+
 -  functionalities inspired from Crimestat made under the direction of Ned Levine (https://nij.gov/topics/technology/maps/pages/crimestat.aspx)
 
+Many many thanks to all the community of Quantum GIS !
 
 References
 ===========
