@@ -10,7 +10,7 @@
 name=Visualist
 qgisMinimumVersion=3.4
 description=Plugin for Crime Analysts
-version=0.5
+version=0.6
 author=Quentin Rossy
 email=quentin.rossy@unil.ch
 

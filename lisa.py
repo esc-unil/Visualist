@@ -51,6 +51,7 @@ from qgis.core import (
                 QgsProcessingParameterNumber
                 )
 
+
 from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
 
