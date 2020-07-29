@@ -42,15 +42,28 @@ from .PointsToEdge import PointsToEdge
 from .EdgesToFlow import EdgesToFlow
 from .Lisa import LocalIndicatorSpatialA
 from .NearestNeighbourAnalysis import NearestNeighbourAnalysis
+from .MeetingPoints import MeetingPointsAnalysis
 from .DistanceAnalysis import DistanceAnalysis
 
 class VisualistProvider(QgsProcessingProvider):
 
     def __init__(self):
         QgsProcessingProvider.__init__(self)
+        self.algs = []
 
-        # Load algorithms
-        self.alglist = [
+    def load(self):
+        """In this method we add settings needed to configure our
+        provider.
+        """
+        self.refreshAlgorithms()
+        return True
+
+    def icon(self):
+        iconName = 'visualist.png'
+        return QIcon(":/plugins/visualist/icons/" + iconName)
+
+    def getAlgs(self):
+        algs = [
                     PointsInPolygon(),
                     PointsToProportional(),
                     PointsInGrid(),
@@ -61,27 +74,18 @@ class VisualistProvider(QgsProcessingProvider):
                     PointsToNNCluster(),
                     LocalIndicatorSpatialA(),
                     NearestNeighbourAnalysis(),
-                    DistanceAnalysis()
+                    DistanceAnalysis(),
+                    #MeetingPointsAnalysis(), #Will be added in next version
                     ]
 
-
-
-    def unload(self):
-        """
-        Unloads the provider. Any tear-down steps required by the provider
-        should be implemented here.
-        """
-        pass
-
-    def icon(self):
-        iconName = 'visualist.png'
-        return QIcon(":/plugins/visualist/icons/" + iconName)
+        return algs
 
     def loadAlgorithms(self):
         """
         Loads all algorithms belonging to this provider.
         """
-        for alg in self.alglist:
+        self.algs = self.getAlgs()
+        for alg in self.algs:
             self.addAlgorithm( alg )
 
     def id(self):

@@ -70,6 +70,13 @@ nearestneighbouranalysis:
   helpUrl:      '#k-nearest-neighbours-analysis'
   description:  >
     Plot the k-nearest neighbour distances and calculate the NN-Index.
+meetingpointanalysis:
+  displayName:  Meeting Points analysis
+  icon:         relational.png
+  group:        Spatial statistics
+  helpUrl:      '#meeting-points-analysis'
+  description:  >
+    Calculate spatiotemporal matches between two layers of points.
 distanceanalysis:
   displayName:  Distance analysis
   icon:         relational.png

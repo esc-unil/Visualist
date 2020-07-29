@@ -67,7 +67,7 @@ If you would like to report a bug, make suggestions for improving Visualist,
 or have a question about the tools, please use: https://github.com/esc-unil/Visualist/issues
 
 Installing and using the plugin
-=========================
+================================
 
 Install the plugin via the Plugin Manager (Plugins -> Manage and Install Plugins). Search for Visualist and install the plugin. 
 To use the plugin, open the Processing Toolbox (Processing -> Toolbox or from the toolbar).
