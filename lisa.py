@@ -31,7 +31,7 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 __revision__ = '$Format:%H$'
 
 import os, tempfile, sys
-from . import pysal
+from visualist import pysal
 import numpy
 
 from qgis.PyQt.QtCore import QVariant

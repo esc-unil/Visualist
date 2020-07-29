@@ -55,10 +55,11 @@ log = lambda m: QgsMessageLog.logMessage(m, NAME)
 
 class VisualistPlugin(object):
 
-    def __init__(self):
+    def __init__(self, iface):
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
-
+        # Save reference to the QGIS interface
+        self.iface = iface
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         log('Locale: {}'.format(locale))
@@ -87,11 +88,15 @@ class VisualistPlugin(object):
         for helper in yaml_document:
             s.setValue("visualist/help/"+helper, yaml_document[helper])
 
-        #initialize provider
+        self.provider = None
+
+    def initProcessing(self):
+        """Init Processing provider for QGIS >= 3.8."""
         self.provider = VisualistProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        self.initProcessing()
 
     def unload(self):
         QgsApplication.processingRegistry().removeProvider(self.provider)

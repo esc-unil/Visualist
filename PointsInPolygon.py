@@ -123,6 +123,8 @@ class PointsInPolygon(VisualistAlgorithm):
 
         field_name = self.parameterAsString(parameters, self.FIELD, context)
         self.field_name = field_name
+        if weight_field:
+            self.field_name = field_name+'_WEIGHTED'
 
         fields = poly_source.fields()
         if fields.lookupField(field_name) < 0:
@@ -162,10 +164,14 @@ class PointsInPolygon(VisualistAlgorithm):
                 weight = polygon_feature[weight_field_index]
                 if weight == None or weight == 0:
                     weighted_count = 0
-                    feedback.pushInfo('Error with feature {} : no value for weight field'.format(polygon_feature.id()))
+                    feedback.pushInfo('Error with feature {} : no value for weight'.format(polygon_feature.id()))
                 else:
-                    weighted_count = (count*multiplier)/float(weight)
-                    attrs.append(weighted_count)
+                    try:
+                        weighted_count = (count*multiplier)/float(weight)
+                        attrs.append(weighted_count)
+                    except:
+                        feedback.pushInfo('Error with feature {} : {} is not a valid weight'.format(polygon_feature.id(), weight))
+
             output_feature.setAttributes(attrs)
             sink.addFeature(output_feature, QgsFeatureSink.FastInsert)
 

@@ -83,7 +83,7 @@ class PointsInGrid(VisualistAlgorithm):
     def initAlgorithm(self, config=None):
         point_source = QgsProcessingParameterFeatureSource(self.POINTS,self.tr('Points'), [QgsProcessing.TypeVectorPoint])
         self.addParameter(point_source)
-        
+
         self.addParameter(QgsProcessingParameterExtent(self.EXTENT, self.tr('Grid extent')))
 
         grid_size = QgsProcessingParameterDistance(self.GRID,self.tr('Size of the grid'),parentParameterName=self.POINTS,defaultValue=100)
