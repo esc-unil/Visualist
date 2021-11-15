@@ -1,5 +1,5 @@
 Visualist: a spatial analysis plugin for crime analysts
-This is a python plugin for Quantum GIS 3 (https://qgis.org/) [gis2019]
+This is a python plugin for Quantum GIS 3 (https://qgis.org/)
 
 Aims
 The goal of Visualist is to provide a one-stop resource for many common Crime Analysts GIS tasks, without the need for additional software, libraries, or complex workarounds.
