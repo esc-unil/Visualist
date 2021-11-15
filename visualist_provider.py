@@ -74,7 +74,7 @@ class VisualistProvider(QgsProcessingProvider):
                     PointsToNNCluster(),
                     LocalIndicatorSpatialA(),
                     NearestNeighbourAnalysis(),
-                    DistanceAnalysis(),
+                    #DistanceAnalysis(), # TODO
                     #MeetingPointsAnalysis(), #Will be added in next version
                     ]
 

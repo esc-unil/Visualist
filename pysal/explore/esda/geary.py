@@ -21,9 +21,9 @@ class Geary(object):
                      (n, 1) attribute vector
     w              : W
                      spatial weights
-    transformation : {'B', 'R', 'D', 'U', 'V'}
-                     weights transformation, default is binary.
-                     Other options include "R": row-standardized, "D":
+    transformation : {'R', 'B', 'D', 'U', 'V'}
+                     weights transformation, default is row-standardized.
+                     Other options include "B": binary, "D":
                      doubly-standardized, "U": untransformed (general
                      weights), "V": variance-stabilizing.
     permutations   : int
@@ -80,10 +80,10 @@ class Geary(object):
 
     Examples
     --------
-    >>> import pysal.lib
-    >>> from pysal.explore.esda.geary import Geary
-    >>> w = pysal.lib.io.open(pysal.lib.examples.get_path("book.gal")).read()
-    >>> f = pysal.lib.io.open(pysal.lib.examples.get_path("book.txt"))
+    >>> import libpysal
+    >>> from esda.geary import Geary
+    >>> w = libpysal.io.open(libpysal.examples.get_path("book.gal")).read()
+    >>> f = libpysal.io.open(libpysal.examples.get_path("book.txt"))
     >>> y = np.array(f.by_col['y'])
     >>> c = Geary(y,w,permutations=0)
     >>> round(c.C,7)
@@ -107,6 +107,8 @@ class Geary(object):
         self.y = y
         w.transform = transformation
         self.w = w
+        self._focal_ix, self._neighbor_ix = w.sparse.nonzero()
+        self._weights = w.sparse.data
         self.permutations = permutations
         self.__moments()
         xn = range(len(y))
@@ -114,6 +116,7 @@ class Geary(object):
         self.y2 = y * y
         yd = y - y.mean()
         yss = sum(yd * yd)
+
         self.den = yss * self.w.s0 * 2.0
         self.C = self.__calc(y)
         de = self.C - 1.0
@@ -145,7 +148,7 @@ class Geary(object):
 
     @property
     def _statistic(self):
-        """ a standardized accessor for pysal.explore.esda statistics"""
+        """ a standardized accessor for esda statistics"""
         return self.C
 
     def __moments(self):
@@ -173,16 +176,12 @@ class Geary(object):
         self.seC_rand = vc_rand ** (0.5)
         self.seC_norm = vc_norm ** (0.5)
 
+    
     def __calc(self, y):
-        ys = np.zeros(y.shape)
-        y2 = y ** 2
-        for i, i0 in enumerate(self.w.id_order):
-            neighbors = self.w.neighbor_offsets[i0]
-            wijs = self.w.weights[i0]
-            z = list(zip(neighbors, wijs))
-            ys[i] = sum([wij * (y2[i] - 2 * y[i] * y[j] + y2[j])
-                         for j, wij in z])
-        a = (self.n - 1) * sum(ys)
+        num = (self._weights * 
+               ((y[self._focal_ix] 
+                 - y[self._neighbor_ix])**2) ).sum()
+        a = (self.n - 1) * num 
         return a / self.den
 
     @classmethod

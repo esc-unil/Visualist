@@ -1,9 +1,5 @@
-__version__ = "4.0.1"
-
-# __version__ has to be define in the first line
-
 """
-pysal.lib: Python Spatial Analysis Library (core)
+libpysal: Python Spatial Analysis Library (core)
 ================================================
 
 
@@ -27,3 +23,7 @@ weights
 from . import cg
 from . import io
 from . import weights
+
+from . import _version
+
+__version__ = _version.get_versions()["version"]

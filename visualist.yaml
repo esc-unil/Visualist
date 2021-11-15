@@ -64,21 +64,21 @@ lisamap:
     Analysis of local spatial autocorrelation statistics.
     The plugin cover the Local Moran's I (Clusters and Outliers Analysis), and Getis-Ord Gi* (Hot-Spot Analysis) statistics.
 nearestneighbouranalysis:
-  displayName:  Nearest neighbour analysis
+  displayName:  Nearest Neighbour Analysis
   icon:         knn.png
   group:        Spatial statistics
   helpUrl:      '#k-nearest-neighbours-analysis'
   description:  >
     Plot the k-nearest neighbour distances and calculate the NN-Index.
 meetingpointanalysis:
-  displayName:  Meeting Points analysis
+  displayName:  Meeting Points Analysis
   icon:         relational.png
-  group:        Spatial statistics
+  group:        Spatiotemporal Analysis
   helpUrl:      '#meeting-points-analysis'
   description:  >
     Calculate spatiotemporal matches between two layers of points.
 distanceanalysis:
-  displayName:  Distance analysis
+  displayName:  Distance Analysis
   icon:         relational.png
   group:        Spatial statistics
   helpUrl:      '#distance-analysis'

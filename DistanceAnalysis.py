@@ -136,7 +136,7 @@ class DistanceAnalysis(VisualistAlgorithm):
 
         spatialIndex = QgsSpatialIndex(source, feedback)
 
-        uniqueValues = source.uniqueValues(field_split)
+        uniqueValues = source.uniqueValues(field_split_index)
         total = 100.0 / len(uniqueValues) if uniqueValues else 1
 
 
@@ -148,18 +148,14 @@ class DistanceAnalysis(VisualistAlgorithm):
             if feedback.isCanceled():
                 break
             filter = '{} = {}'.format(QgsExpression.quotedColumnRef(field_split), QgsExpression.quotedValue(i))
-            req = QgsFeatureRequest().setFilterExpression(filter).setSubsetOfAttributes([field_event])
+            req = QgsFeatureRequest().setFilterExpression(filter).setSubsetOfAttributes([field_event_index])
             features = source.getFeatures(req)
             for current, inFeat in enumerate(features):
                 if feedback.isCanceled():
                     break
-
                 inGeom = inFeat.geometry()
                 inID = str(inFeat[field_event])
-                featList = index.nearestNeighbor(inGeom.asPoint(), 1)
-
-
+                featList = spatialIndex.nearestNeighbor(inGeom.asPoint(), 1)
 
         self.output = {self.OUTPUT_HTML_FILE: output_file}
-
         return self.output

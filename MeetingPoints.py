@@ -36,7 +36,7 @@ import plotly as plt
 import plotly.graph_objs as go
 from plotly import tools
 
-from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtCore import QUrl, QVariant, QDateTime
 from qgis.PyQt.QtWebKitWidgets import QWebView
 from qgis.PyQt.QtWidgets import (QDialog,
                         QWidget,
@@ -46,7 +46,12 @@ from qgis.PyQt.QtWidgets import (QDialog,
 from qgis.utils import iface
 from qgis.core import (QgsApplication,
                        QgsFeatureRequest,
+                       QgsFeatureSink,
                        QgsFeature,
+                       QgsFields,
+                       QgsField,
+                       QgsGeometry,
+                       QgsWkbTypes,
                        QgsDistanceArea,
                        QgsProject,
                        QgsProcessing,
@@ -61,16 +66,20 @@ from qgis.core import (QgsApplication,
                        QgsProcessingParameterField,
                        QgsProcessingParameterExpression,
                        QgsProcessingParameterDefinition,
+                       QgsProcessingParameterFeatureSink,
                        QgsSpatialIndex,
                        QgsCoordinateTransform,
                        QgsRectangle,
                        QgsDateTimeStatisticalSummary,
-                       QgsExpression)
+                       QgsExpression,
+                       QgsProcessingUtils)
 
 from processing.gui.BatchPanel import BatchPanel
 
 from .visualist_alg import VisualistAlgorithm
 from .TimeFormater import temporalAnalyser as TA
+from datetime import datetime
+from datetime import timedelta
 
 class WebDialog(QDialog):
 
@@ -105,6 +114,8 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
     DELTA_GEO = 'DELTAGEO'
     DELTA_TIME = 'DELTATIME'
 
+    OUTPUT_LINE = 'OUTPUT_LINE'
+
     def __init__(self):
         super().__init__()
 
@@ -124,7 +135,7 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
                                                       self.tr('End datetime [first input]'),
                                                       parentLayerParameterName=self.INPUT1,
                                                       optional=True,
-                                                      type = QgsProcessingParameterField.DateTime, defaultValue="date_fin")
+                                                      type = QgsProcessingParameterField.DateTime)
         edt1.setFlags(edt1.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(edt1)
         filter1 = QgsProcessingParameterExpression(self.FILTER1,
@@ -135,7 +146,7 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
         self.addParameter(filter1)
 
         self.addParameter(QgsProcessingParameterFeatureSource(self.INPUT2,
-                                                              self.tr('Second Input point layer'), [QgsProcessing.TypeVectorPoint], defaultValue="tel1"))
+                                                              self.tr('Second Input point layer'), [QgsProcessing.TypeVectorPoint]))
         sdt2 = QgsProcessingParameterField(self.STARTDT2_FIELD,
                                                       self.tr('Start datetime [second input]'),
                                                       parentLayerParameterName=self.INPUT2,
@@ -158,18 +169,18 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
 
         self.addParameter(QgsProcessingParameterCrs(self.CRS, 'PROJECTED CRS', defaultValue="EPSG:2056"))
         self.addParameter(QgsProcessingParameterNumber(self.DELTA_GEO,
-                                                    self.tr('Maximum spatialdistance [m]'),
-                                                    defaultValue=100))
+                                                    self.tr('Maximum spatial distance [meter]'),
+                                                    defaultValue=200))
         self.addParameter(QgsProcessingParameterNumber(self.DELTA_TIME,
-                                                    self.tr('Maximum spatialdistance [min]'),
+                                                    self.tr('Maximum temporal distance [min]'),
                                                     defaultValue=60))
         # self.addParameter(QgsProcessingParameterField(self.FIELDS,
         #                                               self.tr('Fields to include'),
         #                                               parentLayerParameterName=self.INPUT,
         #                                               allowMultiple=True, optional=True))
-        # self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_LINE,
-        #                                                 self.tr('Match'),
-        #                                                 QgsProcessing.TypeVectorLine))
+        self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_LINE,
+                                                        self.tr('Match'),
+                                                        QgsProcessing.TypeVectorLine))
         # self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_POINT,
         #                                                 self.tr('End points'),
         #                                                 QgsProcessing.TypeVectorPoint))
@@ -182,6 +193,11 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
         # dial.setHTML(self.path)
         # dial.show()
 
+        output = QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
+        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "utils/styles/asLine.qml")
+        feedback.pushInfo('Load symbology from file: {})'.format(path))
+        output.loadNamedStyle(path)
+        output.triggerRepaint()
         return self.output
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -215,20 +231,47 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
         self.delta_geo = self.parameterAsDouble(parameters, self.DELTA_GEO, context)
         self.delta_time = self.parameterAsDouble(parameters, self.DELTA_TIME, context)
 
-        distances = self.compute(feedback)
-        self.output = {}
+        #Create output for lines
+        fields = QgsFields()
+        fields.append(QgsField('SourceId', QVariant.Int, "int", 9, 0))
+        fields.append(QgsField('TargetId', QVariant.Int, "int", 9, 0))
+        fields.append(QgsField('SpatialDistance', QVariant.LongLong))
+        fields.append(QgsField('TemporalDistance', QVariant.String, '', 50))
+        fields.append(QgsField('SourceStartDateTime', QVariant.DateTime))
+        fields.append(QgsField('SourceEndDateTime', QVariant.DateTime))
+        fields.append(QgsField('TargetStartDateTime', QVariant.DateTime))
+        fields.append(QgsField('TargetEndDateTime', QVariant.DateTime))
+        (self.sink, self.dest_id) = self.parameterAsSink(parameters, self.OUTPUT_LINE, context,
+                                                fields, QgsWkbTypes.LineString, self.target_crs)
+        if self.sink is None:
+            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT_LINE))
+
+        distances = self.compute(feedback, context)
+        self.createLayer(distances, feedback)
+        self.output = {self.OUTPUT_LINE: self.dest_id}
         return self.output
 
-    def compute(self, feedback):
+    def compute(self, feedback, context):
         self.distances = []
         if self.calcSpatialArea(feedback):
             if self.calcTemporalBounds(feedback):
-                self.computeDistances(feedback)
+                self.computeDistances(feedback, context)
             else:
                 feedback.pushInfo(self.tr("No temporal overlapping: no match possible!"))
         else:
             feedback.pushInfo(self.tr("No spatial overlapping: no match possible!"))
         return self.distances
+
+    def createLayer(self, distances, feedback):
+        for data in distances:
+            f = QgsFeature()
+            geom = QgsGeometry().fromPolylineXY(data[1])
+            # feedback.pushDebugInfo(self.tr("Geometry: {}").format(geom.constGet().clone()))
+            f.setAttributes(data[0])
+            f.setGeometry(geom)
+            if feedback.isCanceled():
+                return {}
+            self.sink.addFeature(f, QgsFeatureSink.FastInsert)
 
     def getBBox(self, source, transform):
         bb = source.sourceExtent()
@@ -289,7 +332,7 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
         return True
 
     def filter(self, source, fields, feedback):
-        filter = 'cast({} as character) >= {} AND cast({} as character) <= {}'.format(
+        filter = '{} >= {} AND {} <= {}'.format(
                                 QgsExpression.quotedColumnRef(fields[0]),
                                 QgsExpression.quotedValue(self.dateStr(self.period[0])),
                                 QgsExpression.quotedColumnRef(fields[1]),
@@ -304,46 +347,71 @@ class MeetingPointsAnalysis(VisualistAlgorithm):
         for current, inFeat in enumerate(features):
             i += 1
         feedback.pushDebugInfo(self.tr("{} lines selected in {}").format(i, source.sourceName()))
-        return features
+        return req
 
-    def computeDistances(self, feedback):
-        features1 = self.filter(self.source1, [self.sdt1_field, self.edt1_field], feedback)
-        features2 = self.filter(self.source2, [self.sdt2_field, self.edt2_field], feedback)
-        for current, inFeat in enumerate(features1):
+    def convert_timedelta(self, duration):
+        days, seconds = duration.days, duration.seconds
+        hours = days * 24 + seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = (seconds % 60)
+        return '{} hours, {} minutes, {} seconds'.format(hours, minutes, seconds)
+
+    def computeDistances(self, feedback, context):
+        time_delta = timedelta(minutes=self.delta_time) #days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0
+        req1 = self.filter(self.source1, [self.sdt1_field, self.edt1_field], feedback)
+        req2 = self.filter(self.source2, [self.sdt2_field, self.edt2_field], feedback)
+        distArea = QgsDistanceArea()
+        distArea.setSourceCrs(self.target_crs, context.transformContext())
+        distArea.setEllipsoid(context.project().ellipsoid())
+        total = 100.0 / self.source1.featureCount() if self.source1.featureCount() else 0
+        distList = []
+        feedback.setProgressText(self.tr("Run spatiotemporal comparison"))
+        # spatialIndex = QgsSpatialIndex(self.source2.getFeatures(req2), feedback)
+        spatialIndex = QgsSpatialIndex(self.source2.getFeatures(req2.setSubsetOfAttributes([]).setDestinationCrs(self.target_crs, context.transformContext())), feedback)
+        for current, inFeat in enumerate(self.source1.getFeatures(req1)):
             if feedback.isCanceled():
                 break
-
-            inGeom = inFeat.geometry()
-        #line = [id, dt1, dt2, point]
-        self.distances = []
-        data = []
-        for lyrId, d in self.toMatch.items():
-            data.append([lyrId, sorted(d, key=operator.itemgetter(1))])
-        for line1 in data[0][1]:
-            if not self.isAlive:
-                return False
-            for line2 in data[1][1]:
-                #iplugin.warning(str(lyrId1)+" "+str(line1)+"/"+str(lyrId2)+" "+str(line2))
-                #List are sorted, so if line1:dt1 - delta > line2:dt2, stop
-                if (line2[1] - DELTA_TIME) > line1[2]: break
-                dist = self.calcDistance(line1, line2)
-                if dist != None:
-                    attribs = [data[0][0], line1[0], data[1][0], line2[0], dist[0], dist[1],
-                        line1[3], line2[3], line1[1], line1[2], line2[1], line2[2]]
-                    self.distances.append(attribs)
-
-    def calcDistance(self, line1, line2):
-        #line = [id, dt1, dt2, point]
-        #calc temporal distance
-        if line1[2] < line2[1]: timeDist = line2[1]-line1[2]
-        elif line1[1] > line2[2]: timeDist = line1[1]-line2[2]
-        else: timeDist = timedelta(0, 0, 0, 0, 0, 0, 0)
-        #Check if > DELTA_TIME
-        if timeDist > self.delta_time: return None
-        #Calc spatial distance
-        dx = line1[3].x() - line2[3].x()
-        dy = line1[3].y() - line2[3].y()
-        geoDist = math.sqrt(dx * dx + dy * dy) #round()
-        #Check if > self.delta_geo
-        if geoDist > self.delta_geo: return None
-        return [timeDist, geoDist]
+            inGeom = inFeat.geometry().asPoint()
+            if self.source1.sourceCrs().srsid() != self.target_crs.srsid():
+                inGeom = self.s1_transform.transform(inGeom)
+            sdt1 = inFeat.attribute(self.sdt1_field).toPyDateTime()
+            edt1 = inFeat.attribute(self.edt1_field).toPyDateTime()
+            rect = QgsRectangle(
+                    inGeom.x()-self.delta_geo*2,
+                    inGeom.y()-self.delta_geo*2,
+                    inGeom.x()+self.delta_geo*2,
+                    inGeom.y()+self.delta_geo*2)
+            neighbours = spatialIndex.intersects(rect)
+            # feedback.pushDebugInfo(self.tr("{} neighbours for {}").format(len(neighbours), rect))
+            # request = QgsFeatureRequest().setFilterRect(areaOfInterest)
+            for outFeat in self.source2.getFeatures(QgsFeatureRequest(neighbours)):
+                if feedback.isCanceled():
+                    break
+                sdt2 = outFeat.attribute(self.sdt2_field).toPyDateTime()
+                edt2 = outFeat.attribute(self.edt2_field).toPyDateTime()
+                if sdt2 >= edt1 + time_delta or sdt1 >= edt2 + time_delta:
+                    continue
+                temporalDistance = timedelta(0, 0, 0)
+                if sdt2 >= edt1:
+                    temporalDistance = sdt2 - edt1
+                elif sdt1 >= edt2:
+                    temporalDistance = sdt1 - edt2
+                outGeom = outFeat.geometry().asPoint()
+                if self.source2.sourceCrs().srsid() != self.target_crs.srsid():
+                    outGeom = self.s2_transform.transform(outGeom)
+                spatialDistance = distArea.measureLine(inGeom, outGeom)
+                if spatialDistance <= self.delta_geo:
+                    # feedback.pushDebugInfo(self.tr("{} is near {}: geoDist : {} times: {} {} / {} {}").format(inFeat.id(), outFeat.id(), spatialDistance, sdt1, edt1, sdt2, edt2))
+                    self.distances.append([
+                        [inFeat.id(),
+                            outFeat.id(),
+                            spatialDistance,
+                            self.convert_timedelta(temporalDistance),
+                            inFeat.attribute(self.sdt1_field),
+                            inFeat.attribute(self.edt1_field),
+                            outFeat.attribute(self.sdt2_field),
+                            outFeat.attribute(self.edt2_field)
+                            ],
+                        [inGeom, outGeom]
+                    ])
+            feedback.setProgress(int(current * total))

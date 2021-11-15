@@ -646,8 +646,8 @@ class Excess_Risk(_Smoother):
 
     Reading data in stl_hom.csv into stl to extract values
     for event and population-at-risk variables
-    >>> import pysal.lib
-    >>> stl = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'), 'r')
+    >>> import libpysal
+    >>> stl = libpysal.io.open(libpysal.examples.get_path('stl_hom.csv'), 'r')
 
     The 11th and 14th columns in stl_hom.csv includes the number of homocides and population.
     Creating two arrays from these columns.
@@ -701,8 +701,9 @@ class Empirical_Bayes(_Smoother):
     Reading data in stl_hom.csv into stl to extract values
     for event and population-at-risk variables
 
-    >>> import pysal.lib
-    >>> stl = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'), 'r')
+    >>> import libpysal
+    >>> stl_ex = libpysal.examples.load_example('stl')
+    >>> stl = libpysal.io.open(stl_ex.get_path('stl_hom.csv'), 'r')
 
     The 11th and 14th columns in stl_hom.csv includes the number of homocides and population.
     Creating two arrays from these columns.
@@ -845,8 +846,9 @@ class Spatial_Empirical_Bayes(_Spatial_Smoother):
     Reading data in stl_hom.csv into stl to extract values
     for event and population-at-risk variables
 
-    >>> import pysal.lib
-    >>> stl = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'), 'r')
+    >>> import libpysal
+    >>> stl_ex = libpysal.examples.load_example('stl')
+    >>> stl = libpysal.io.open(stl_ex.get_path('stl_hom.csv'), 'r')
 
     The 11th and 14th columns in stl_hom.csv includes the number of homocides and population.
     Creating two arrays from these columns.
@@ -855,7 +857,7 @@ class Spatial_Empirical_Bayes(_Spatial_Smoother):
 
     Creating a spatial weights instance by reading in stl.gal file.
 
-    >>> stl_w = pysal.lib.io.open(pysal.lib.examples.get_path('stl.gal'), 'r').read()
+    >>> stl_w = libpysal.io.open(stl_ex.get_path('stl.gal'), 'r').read()
 
     Ensuring that the elements in the spatial weights instance are ordered
     by the given sequential numbers from 1 to the number of observations in stl_hom.csv
@@ -864,7 +866,7 @@ class Spatial_Empirical_Bayes(_Spatial_Smoother):
 
     Creating an instance of Spatial_Empirical_Bayes class using stl_e, stl_b, and stl_w
 
-    >>> from pysal.explore.esda.smoothing import Spatial_Empirical_Bayes
+    >>> from esda.smoothing import Spatial_Empirical_Bayes
     >>> s_eb = Spatial_Empirical_Bayes(stl_e, stl_b, stl_w)
 
     Extracting the risk values through the property r of s_eb
@@ -925,8 +927,9 @@ class Spatial_Rate(_Spatial_Smoother):
     Reading data in stl_hom.csv into stl to extract values
     for event and population-at-risk variables
 
-    >>> import pysal.lib
-    >>> stl = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'), 'r')
+    >>> import libpysal
+    >>> stl_ex = libpysal.examples.load_example('stl')
+    >>> stl = libpysal.io.open(stl_ex.get_path('stl_hom.csv'), 'r')
 
     The 11th and 14th columns in stl_hom.csv includes the number of homocides and population.
     Creating two arrays from these columns.
@@ -935,7 +938,7 @@ class Spatial_Rate(_Spatial_Smoother):
 
     Creating a spatial weights instance by reading in stl.gal file.
 
-    >>> stl_w = pysal.lib.io.open(pysal.lib.examples.get_path('stl.gal'), 'r').read()
+    >>> stl_w = libpysal.io.open(stl_ex.get_path('stl.gal'), 'r').read()
 
     Ensuring that the elements in the spatial weights instance are ordered
     by the given sequential numbers from 1 to the number of observations in stl_hom.csv
@@ -944,7 +947,7 @@ class Spatial_Rate(_Spatial_Smoother):
 
     Creating an instance of Spatial_Rate class using stl_e, stl_b, and stl_w
 
-    >>> from pysal.explore.esda.smoothing import Spatial_Rate
+    >>> from esda.smoothing import Spatial_Rate
     >>> sr = Spatial_Rate(stl_e,stl_b,stl_w)
 
     Extracting the risk values through the property r of sr
@@ -1180,7 +1183,7 @@ class Age_Adjusted_Smoother(_Spatial_Smoother):
             w = [w] * len(e)
         if not all(isinstance(wi, W) for wi in w):
             raise Exception('Weights object must be an instance of '
-                            ' pysal.lib.weights.W!')
+                            ' libpysal.weights.W!')
         b = b * len(e) if len(b) == 1 and len(e) > 1 else b
         s = s * len(e) if len(s) == 1 and len(e) > 1 else s
         try:
@@ -1203,8 +1206,8 @@ class Age_Adjusted_Smoother(_Spatial_Smoother):
             max_len = 0 if len(this_r) > max_len else max_len
             rdf.append((outcol, this_r.tolist()))
         padded = (r[1] + [None] * max_len for r in rdf)
-        rdf = list(zip((r[0] for r in rdf), padded))
-        rdf = pd.DataFrame.from_items(rdf)
+        rdf = dict(zip((r[0] for r in rdf), padded))
+        rdf = pd.DataFrame.from_dict(rdf)
         return rdf
 
 
@@ -1230,8 +1233,10 @@ class Disk_Smoother(_Spatial_Smoother):
     Reading data in stl_hom.csv into stl to extract values
     for event and population-at-risk variables
 
-    >>> import pysal.lib
-    >>> stl = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'), 'r')
+    >>> import libpysal
+
+    >>> stl_ex = libpysal.examples.load_example('stl')
+    >>> stl = libpysal.io.open(stl_ex.get_path('stl_hom.csv'), 'r')
 
     The 11th and 14th columns in stl_hom.csv includes the number of homocides and population.
     Creating two arrays from these columns.
@@ -1240,7 +1245,7 @@ class Disk_Smoother(_Spatial_Smoother):
 
     Creating a spatial weights instance by reading in stl.gal file.
 
-    >>> stl_w = pysal.lib.io.open(pysal.lib.examples.get_path('stl.gal'), 'r').read()
+    >>> stl_w = libpysal.io.open(stl_ex.get_path('stl.gal'), 'r').read()
 
     Ensuring that the elements in the spatial weights instance are ordered
     by the given sequential numbers from 1 to the number of observations in stl_hom.csv
@@ -1309,8 +1314,9 @@ class Spatial_Median_Rate(_Spatial_Smoother):
     Reading data in stl_hom.csv into stl to extract values
     for event and population-at-risk variables
 
-    >>> import pysal.lib
-    >>> stl = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'), 'r')
+    >>> import libpysal
+    >>> stl_ex = libpysal.examples.load_example('stl')
+    >>> stl = libpysal.io.open(stl_ex.get_path('stl_hom.csv'), 'r')
 
     The 11th and 14th columns in stl_hom.csv includes the number of homocides and population.
     Creating two arrays from these columns.
@@ -1319,7 +1325,7 @@ class Spatial_Median_Rate(_Spatial_Smoother):
 
     Creating a spatial weights instance by reading in stl.gal file.
 
-    >>> stl_w = pysal.lib.io.open(pysal.lib.examples.get_path('stl.gal'), 'r').read()
+    >>> stl_w = libpysal.io.open(stl_ex.get_path('stl.gal'), 'r').read()
 
     Ensuring that the elements in the spatial weights instance are ordered
     by the given sequential numbers from 1 to the number of observations in stl_hom.csv
@@ -1438,13 +1444,14 @@ class Spatial_Filtering(_Smoother):
     Reading data in stl_hom.csv into stl to extract values
     for event and population-at-risk variables
 
-    >>> import pysal.lib
-    >>> stl = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'), 'r')
+    >>> import libpysal
+    >>> stl_ex = libpysal.examples.load_example('stl')
+    >>> stl = libpysal.io.open(stl_ex.get_path('stl_hom.csv'), 'r')
 
     Reading the stl data in the WKT format so that
     we can easily extract polygon centroids
 
-    >>> from pysal.lib.io.util.wkt import WKTParser
+    >>> from libpysal.io.util.wkt import WKTParser
     >>> fromWKT = WKTParser()
     >>> stl.cast('WKT',fromWKT)
 
@@ -1579,7 +1586,7 @@ class Spatial_Filtering(_Smoother):
             items = [(name, col) for name,col in zip(colnames, [grid[:,0],
                                                                 grid[:,1],
                                                                 r.r])]
-            res.append(pd.DataFrame.from_items(items))
+            res.append(pd.DataFrame.from_dict(dict(items)))
         outdf = pd.concat(res)
         return outdf
 
@@ -1614,17 +1621,17 @@ class Headbanging_Triples(object):
 
     importing k-nearest neighbor weights creator
 
-    >>> import pysal.lib # doctest: +SKIP
+    >>> import libpysal # doctest: +SKIP
 
     Reading data in stl_hom.csv into stl_db to extract values
     for event and population-at-risk variables
 
-    >>> stl_db = pysal.lib.io.open(pysal.lib.examples.get_path('stl_hom.csv'),'r') # doctest: +SKIP
+    >>> stl_db = libpysal.io.open(libpysal.examples.get_path('stl_hom.csv'),'r') # doctest: +SKIP
 
     Reading the stl data in the WKT format so that
     we can easily extract polygon centroids
 
-    >>> from pysal.lib.io.util.wkt import WKTParser # doctest: +SKIP
+    >>> from libpysal.io.util.wkt import WKTParser # doctest: +SKIP
     >>> fromWKT = WKTParser() # doctest: +SKIP
     >>> stl_db.cast('WKT',fromWKT) # doctest: +SKIP
 
@@ -1634,7 +1641,7 @@ class Headbanging_Triples(object):
 
     Using the centroids, we create a 5-nearst neighbor weights
 
-    >>> w = pysal.lib.weights.KNN(d,k=5) # doctest: +SKIP
+    >>> w = libpysal.weights.KNN(d,k=5) # doctest: +SKIP
 
     Ensuring that the elements in the spatial weights instance are ordered
     by the order of stl_db's IDs
@@ -1657,15 +1664,15 @@ class Headbanging_Triples(object):
 
     Opening sids2.shp file
 
-    >>> import pysal.lib
-    >>> sids = pysal.lib.io.open(pysal.lib.examples.get_path('sids2.shp'),'r') # doctest: +SKIP
+    >>> import libpysal
+    >>> sids = libpysal.io.open(libpysal.examples.get_path('sids2.shp'),'r') # doctest: +SKIP
 
     Extracting the centroids of polygons in the sids data
 
     >>> sids_d = np.array([i.centroid for i in sids]) # doctest: +SKIP
 
     Creating a 5-nearest neighbors weights from the sids centroids
-    >>> sids_w = pysal.lib.weights.KNN(sids_d,k=5) # doctest: +SKIP
+    >>> sids_w = libpysal.weights.KNN(sids_d,k=5) # doctest: +SKIP
 
     Ensuring that the members in sids_w are ordered by
     the order of sids_d's ID
@@ -1798,78 +1805,78 @@ class Headbanging_Median_Rate(object):
     Examples
     --------
 
-    >>> import pysal.lib # doctest: +SKIP
+    >>> import libpysal # doctest: +SKIP 
 
 
     opening the sids2 shapefile
 
-    >>> sids = pysal.lib.io.open(pysal.lib.examples.get_path('sids2.shp'), 'r') # doctest: +SKIP
+    >>> sids = libpysal.io.open(libpysal.examples.get_path('sids2.shp'), 'r') # doctest: +SKIP 
 
 
     extracting the centroids of polygons in the sids2 data
 
-    >>> sids_d = np.array([i.centroid for i in sids]) # doctest: +SKIP
+    >>> sids_d = np.array([i.centroid for i in sids]) # doctest: +SKIP 
 
 
     creating a 5-nearest neighbors weights from the centroids
 
-    >>> sids_w = pysal.lib.weights.KNN(sids_d,k=5) # doctest: +SKIP
+    >>> sids_w = libpysal.weights.KNN(sids_d,k=5) # doctest: +SKIP 
 
 
     ensuring that the members in sids_w are ordered
 
-    >>> if not sids_w.id_order_set: sids_w.id_order = sids_w.id_order # doctest: +SKIP
+    >>> if not sids_w.id_order_set: sids_w.id_order = sids_w.id_order # doctest: +SKIP 
 
 
     finding headbanging triples by using 5 neighbors
         return outdf
 
-    >>> s_ht = Headbanging_Triples(sids_d,sids_w,k=5) # doctest: +SKIP
+    >>> s_ht = Headbanging_Triples(sids_d,sids_w,k=5) # doctest: +SKIP 
 
     DeprecationWarning: Deprecated
 
 
     reading in the sids2 data table
 
-    >>> sids_db = pysal.lib.io.open(pysal.lib.examples.get_path('sids2.dbf'), 'r') # doctest: +SKIP
+    >>> sids_db = libpysal.io.open(libpysal.examples.get_path('sids2.dbf'), 'r') # doctest: +SKIP 
 
 
     extracting the 10th and 9th columns in the sids2.dbf and
     using data values as event and population-at-risk variables
 
-    >>> s_e, s_b = np.array(sids_db[:,9]), np.array(sids_db[:,8]) # doctest: +SKIP
+    >>> s_e, s_b = np.array(sids_db[:,9]), np.array(sids_db[:,8]) # doctest: +SKIP 
 
 
     computing headbanging median rates from s_e, s_b, and s_ht
 
-    >>> sids_hb_r = Headbanging_Median_Rate(s_e,s_b,s_ht) # doctest: +SKIP
-
+    >>> sids_hb_r = Headbanging_Median_Rate(s_e,s_b,s_ht) # doctest: +SKIP 
+ 
 
     extracting the computed rates through the property r of the Headbanging_Median_Rate instance
 
-    >>> sids_hb_r.r[:5]  # doctest: +SKIP
+    >>> sids_hb_r.r[:5]  # doctest: +SKIP 
 
     array([ 0.00075586,  0.        ,  0.0008285 ,  0.0018315 ,  0.00498891])
 
     recomputing headbanging median rates with 5 iterations
 
-    >>> sids_hb_r2 = Headbanging_Median_Rate(s_e,s_b,s_ht,iteration=5)  # doctest: +SKIP
+    >>> sids_hb_r2 = Headbanging_Median_Rate(s_e,s_b,s_ht,iteration=5)  # doctest: +SKIP 
 
 
     extracting the computed rates through the property r of the Headbanging_Median_Rate instance
 
-    >>> sids_hb_r2.r[:5]  # doctest: +SKIP
+    >>> sids_hb_r2.r[:5]  # doctest: +SKIP 
 
     array([ 0.0008285 ,  0.00084331,  0.00086896,  0.0018315 ,  0.00498891])
 
     recomputing headbanging median rates by considring a set of auxilliary weights
 
-    >>> sids_hb_r3 = Headbanging_Median_Rate(s_e,s_b,s_ht,aw=s_b)  # doctest: +SKIP
+    >>> sids_hb_r3 = Headbanging_Median_Rate(s_e,s_b,s_ht,aw=s_b)  # doctest: +SKIP 
 
 
     extracting the computed rates through the property r of the Headbanging_Median_Rate instance
 
-    >>> sids_hb_r3.r[:5] # doctest: +SKIP
+    >>> sids_hb_r3.r[:5] # doctest: +SKIP 
     array([ 0.00091659,  0.        ,  0.00156838,  0.0018315 ,  0.00498891])
     """
     def __init__(self, e, b, t, aw=None, iteration=1):

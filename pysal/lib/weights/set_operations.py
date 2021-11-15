@@ -9,11 +9,17 @@ from .weights import W, WSP
 from scipy.sparse import isspmatrix_csr
 from numpy import ones
 
-__all__ = ['w_union', 'w_intersection', 'w_difference',
-           'w_symmetric_difference', 'w_subset', 'w_clip']
+__all__ = [
+    "w_union",
+    "w_intersection",
+    "w_difference",
+    "w_symmetric_difference",
+    "w_subset",
+    "w_clip",
+]
 
 
-def w_union(w1, w2, silence_warnings=False):
+def w_union(w1, w2, **kwargs):
     """
     Returns a binary weights object, w, that includes all neighbor pairs that
     exist in either w1 or w2.
@@ -21,18 +27,17 @@ def w_union(w1, w2, silence_warnings=False):
     Parameters
     ----------
 
-    w1                      : W 
+    w1                      : W
                               object
-    w2                      : W 
+    w2                      : W
                               object
-    silence_warnings   : boolean
-                              Switch to turn off (default on) print statements
-                              for every observation with islands
+    **kwargs                : keyword arguments
+                              optional arguments for :class:`pysal.weights.W`
 
     Returns
     -------
 
-    w       : W 
+    w       : W
               object
 
     Notes
@@ -48,11 +53,10 @@ def w_union(w1, w2, silence_warnings=False):
     and the other is 6x4 (24 areas). A union of these two weights matrices
     results in the new weights matrix matching the larger one.
 
-    >>> from pysal.lib.weights import lat2W
+    >>> from libpysal.weights import lat2W, w_union
     >>> w1 = lat2W(4,4)
     >>> w2 = lat2W(6,4)
-    >>> import pysal.lib
-    >>> w = pysal.lib.weights.set_operations.w_union(w1, w2)
+    >>> w = w_union(w1, w2)
     >>> w1[0] == w[0]
     True
     >>> w1.neighbors[15]
@@ -61,7 +65,6 @@ def w_union(w1, w2, silence_warnings=False):
     [11, 14, 19]
     >>> w.neighbors[15]
     [19, 11, 14]
-    >>>
 
     """
     neighbors = dict(list(w1.neighbors.items()))
@@ -71,34 +74,33 @@ def w_union(w1, w2, silence_warnings=False):
             neighbors[i] = list(add_neigh)
         else:
             neighbors[i] = copy.copy(w2.neighbors[i])
-    return W(neighbors, silence_warnings=silence_warnings)
+    return W(neighbors, **kwargs)
 
 
-def w_intersection(w1, w2, w_shape='w1', silence_warnings=False):
+def w_intersection(w1, w2, w_shape="w1", **kwargs):
     """
-    Returns a binary weights object, w, that includes only 
+    Returns a binary weights object, w, that includes only
     those neighbor pairs that exist in both w1 and w2.
 
     Parameters
     ----------
 
-    w1                      : W 
+    w1                      : W
                               object
-    w2                      : W 
+    w2                      : W
                               object
     w_shape                 : string
                               Defines the shape of the returned weights matrix. 'w1' returns a
                               matrix with the same IDs as w1; 'all' returns a matrix with all
                               the unique IDs from w1 and w2; and 'min' returns a matrix with
                               only the IDs occurring in both w1 and w2.
-    silence_warnings   : boolean
-                              Switch to turn off (default on) print statements
-                              for every observation with islands
+    **kwargs                : keyword arguments
+                              optional arguments for :class:`pysal.weights.W`
 
     Returns
     -------
 
-    w       : W 
+    w       : W
               object
 
     Notes
@@ -113,11 +115,10 @@ def w_intersection(w1, w2, w_shape='w1', silence_warnings=False):
     and the other is 6x4 (24 areas). An intersection of these two weights
     matrices results in the new weights matrix matching the smaller one.
 
-    >>> from pysal.lib.weights import lat2W
+    >>> from libpysal.weights import lat2W, w_intersection
     >>> w1 = lat2W(4,4)
     >>> w2 = lat2W(6,4)
-    >>> import pysal.lib
-    >>> w = pysal.lib.weights.set_operations.w_intersection(w1, w2)
+    >>> w = w_intersection(w1, w2)
     >>> w1[0] == w[0]
     True
     >>> w1.neighbors[15]
@@ -126,17 +127,15 @@ def w_intersection(w1, w2, w_shape='w1', silence_warnings=False):
     [11, 14, 19]
     >>> w.neighbors[15]
     [11, 14]
-    >>>
 
     """
 
-    if w_shape == 'w1':
+    if w_shape == "w1":
         neigh_keys = list(w1.neighbors.keys())
-    elif w_shape == 'all':
+    elif w_shape == "all":
         neigh_keys = set(w1.neighbors.keys()).union(set(w2.neighbors.keys()))
-    elif w_shape == 'min':
-        neigh_keys = set(w1.neighbors.keys(
-        )).intersection(set(w2.neighbors.keys()))
+    elif w_shape == "min":
+        neigh_keys = set(w1.neighbors.keys()).intersection(set(w2.neighbors.keys()))
     else:
         raise Exception("invalid string passed to w_shape")
 
@@ -148,10 +147,10 @@ def w_intersection(w1, w2, w_shape='w1', silence_warnings=False):
         else:
             neighbors[i] = []
 
-    return W(neighbors, silence_warnings=silence_warnings)
+    return W(neighbors, **kwargs)
 
 
-def w_difference(w1, w2, w_shape='w1', constrained=True, silence_warnings=False):
+def w_difference(w1, w2, w_shape="w1", constrained=True, **kwargs):
     """
     Returns a binary weights object, w, that includes only neighbor pairs
     in w1 that are not in w2. The w_shape and constrained parameters
@@ -160,9 +159,9 @@ def w_difference(w1, w2, w_shape='w1', constrained=True, silence_warnings=False)
     Parameters
     ----------
 
-    w1                      : W 
+    w1                      : W
                               object
-    w2                      : W 
+    w2                      : W
                               object
     w_shape                 : string
                               Defines the shape of the returned weights matrix. 'w1' returns a
@@ -174,14 +173,13 @@ def w_difference(w1, w2, w_shape='w1', constrained=True, silence_warnings=False)
                               not in w2 are returned. If True then those pairs that would
                               not be possible if w_shape='min' are dropped. Ignored if
                               w_shape is set to 'min'.
-    silence_warnings   : boolean
-                              Switch to turn off (default on) print statements
-                              for every observation with islands
+    **kwargs                : keyword arguments
+                              optional arguments for :class:`pysal.weights.W`
 
     Returns
     -------
 
-    w       : W 
+    w       : W
               object
 
     Notes
@@ -199,11 +197,10 @@ def w_difference(w1, w2, w_shape='w1', constrained=True, silence_warnings=False)
     bishop matrix). Note that the difference of queen from rook would result
     in a weights matrix with no joins.
 
-    >>> from pysal.lib.weights import lat2W
+    >>> from libpysal.weights import lat2W, w_difference
     >>> w1 = lat2W(4,4,rook=False)
     >>> w2 = lat2W(4,4,rook=True)
-    >>> import pysal.lib
-    >>> w = pysal.lib.weights.set_operations.w_difference(w1, w2, constrained=False)
+    >>> w = w_difference(w1, w2, constrained=False)
     >>> w1[0] == w[0]
     False
     >>> w1.neighbors[15]
@@ -212,17 +209,15 @@ def w_difference(w1, w2, w_shape='w1', constrained=True, silence_warnings=False)
     [11, 14]
     >>> w.neighbors[15]
     [10]
-    >>>
 
     """
 
-    if w_shape == 'w1':
+    if w_shape == "w1":
         neigh_keys = list(w1.neighbors.keys())
-    elif w_shape == 'all':
+    elif w_shape == "all":
         neigh_keys = set(w1.neighbors.keys()).union(set(w2.neighbors.keys()))
-    elif w_shape == 'min':
-        neigh_keys = set(
-            w1.neighbors.keys()).difference(set(w2.neighbors.keys()))
+    elif w_shape == "min":
+        neigh_keys = set(w1.neighbors.keys()).difference(set(w2.neighbors.keys()))
         if not neigh_keys:
             raise Exception("returned an empty weights matrix")
     else:
@@ -232,28 +227,25 @@ def w_difference(w1, w2, w_shape='w1', constrained=True, silence_warnings=False)
     for i in neigh_keys:
         if i in w1.neighbors:
             if i in w2.neighbors:
-                add_neigh = set(w1.neighbors[i]
-                                ).difference(set(w2.neighbors[i]))
+                add_neigh = set(w1.neighbors[i]).difference(set(w2.neighbors[i]))
                 neighbors[i] = list(add_neigh)
             else:
                 neighbors[i] = copy.copy(w1.neighbors[i])
         else:
             neighbors[i] = []
 
-    if constrained or w_shape == 'min':
-        constrained_keys = set(
-            w1.neighbors.keys()).difference(set(w2.neighbors.keys()))
+    if constrained or w_shape == "min":
+        constrained_keys = set(w1.neighbors.keys()).difference(set(w2.neighbors.keys()))
         island_keys = set(neighbors.keys()).difference(constrained_keys)
         for i in island_keys:
             neighbors[i] = []
         for i in constrained_keys:
-            neighbors[i] = list(
-                set(neighbors[i]).intersection(constrained_keys))
+            neighbors[i] = list(set(neighbors[i]).intersection(constrained_keys))
 
-    return W(neighbors, silence_warnings=silence_warnings)
+    return W(neighbors, **kwargs)
 
 
-def w_symmetric_difference(w1, w2, w_shape='all', constrained=True, silence_warnings=False):
+def w_symmetric_difference(w1, w2, w_shape="all", constrained=True, **kwargs):
     """
     Returns a binary weights object, w, that includes only neighbor pairs
     that are not shared by w1 and w2. The w_shape and constrained parameters
@@ -262,9 +254,9 @@ def w_symmetric_difference(w1, w2, w_shape='all', constrained=True, silence_warn
     Parameters
     ----------
 
-    w1                      : W 
+    w1                      : W
                               object
-    w2                      : W 
+    w2                      : W
                               object
     w_shape                 : string
                               Defines the shape of the returned weights matrix. 'all' returns a
@@ -275,14 +267,13 @@ def w_symmetric_difference(w1, w2, w_shape='all', constrained=True, silence_warn
                               shared by w1 and w2 are returned. If True then those pairs
                               that would not be possible if w_shape='min' are dropped.
                               Ignored if w_shape is set to 'min'.
-    silence_warnings   : boolean
-                              Switch to turn off (default on) print statements
-                              for every observation with islands
+    **kwargs                : keyword arguments
+                              optional arguments for :class:`pysal.weights.W`
 
     Returns
     -------
 
-    w       : W 
+    w       : W
               object
 
     Notes
@@ -299,11 +290,10 @@ def w_symmetric_difference(w1, w2, w_shape='all', constrained=True, silence_warn
     contains the corner joins in the overlap area, all the joins in the
     non-overlap area.
 
-    >>> from pysal.lib.weights import lat2W
-    >>> import pysal.lib
+    >>> from libpysal.weights import lat2W, w_symmetric_difference
     >>> w1 = lat2W(4,4,rook=False)
     >>> w2 = lat2W(6,4,rook=True)
-    >>> w = pysal.lib.weights.set_operations.w_symmetric_difference(w1, w2, constrained=False)
+    >>> w = w_symmetric_difference(w1, w2, constrained=False)
     >>> w1[0] == w[0]
     False
     >>> w1.neighbors[15]
@@ -312,15 +302,15 @@ def w_symmetric_difference(w1, w2, w_shape='all', constrained=True, silence_warn
     [11, 14, 19]
     >>> set(w.neighbors[15]) == set([10, 19])
     True
-    >>>
 
     """
 
-    if w_shape == 'all':
+    if w_shape == "all":
         neigh_keys = set(w1.neighbors.keys()).union(set(w2.neighbors.keys()))
-    elif w_shape == 'min':
-        neigh_keys = set(w1.neighbors.keys(
-        )).symmetric_difference(set(w2.neighbors.keys()))
+    elif w_shape == "min":
+        neigh_keys = set(w1.neighbors.keys()).symmetric_difference(
+            set(w2.neighbors.keys())
+        )
     else:
         raise Exception("invalid string passed to w_shape")
 
@@ -329,7 +319,8 @@ def w_symmetric_difference(w1, w2, w_shape='all', constrained=True, silence_warn
         if i in w1.neighbors:
             if i in w2.neighbors:
                 add_neigh = set(w1.neighbors[i]).symmetric_difference(
-                    set(w2.neighbors[i]))
+                    set(w2.neighbors[i])
+                )
                 neighbors[i] = list(add_neigh)
             else:
                 neighbors[i] = copy.copy(w1.neighbors[i])
@@ -338,20 +329,18 @@ def w_symmetric_difference(w1, w2, w_shape='all', constrained=True, silence_warn
         else:
             neighbors[i] = []
 
-    if constrained or w_shape == 'min':
-        constrained_keys = set(
-            w1.neighbors.keys()).difference(set(w2.neighbors.keys()))
+    if constrained or w_shape == "min":
+        constrained_keys = set(w1.neighbors.keys()).difference(set(w2.neighbors.keys()))
         island_keys = set(neighbors.keys()).difference(constrained_keys)
         for i in island_keys:
             neighbors[i] = []
         for i in constrained_keys:
-            neighbors[i] = list(
-                set(neighbors[i]).intersection(constrained_keys))
+            neighbors[i] = list(set(neighbors[i]).intersection(constrained_keys))
 
-    return W(neighbors, silence_warnings=silence_warnings)
+    return W(neighbors, **kwargs)
 
 
-def w_subset(w1, ids, silence_warnings=False):
+def w_subset(w1, ids, **kwargs):
     """
     Returns a binary weights object, w, that includes only those
     observations in ids.
@@ -359,19 +348,18 @@ def w_subset(w1, ids, silence_warnings=False):
     Parameters
     ----------
 
-    w1                      : W 
+    w1                      : W
                               object
     ids                     : list
                               A list containing the IDs to be include in the returned weights
                               object.
-    silence_warnings   : boolean
-                              Switch to turn off (default on) print statements
-                              for every observation with islands
+    **kwargs                : keyword arguments
+                              optional arguments for :class:`pysal.weights.W`
 
     Returns
     -------
 
-    w       : W 
+    w       : W
               object
 
     Examples
@@ -383,21 +371,18 @@ def w_subset(w1, ids, silence_warnings=False):
     previous weights matrix, and only those joins relevant to the new region
     are retained.
 
-
-    >>> from pysal.lib.weights import lat2W
-    >>> import pysal.lib
+    >>> from libpysal.weights import lat2W, w_subset
     >>> w1 = lat2W(6,4)
     >>> ids = range(16)
-    >>> w = pysal.lib.weights.set_operations.w_subset(w1, ids)
+    >>> w = w_subset(w1, ids)
     >>> w1[0] == w[0]
     True
     >>> w1.neighbors[15]
     [11, 14, 19]
     >>> w.neighbors[15]
     [11, 14]
-    >>>
 
-    """ 
+    """
 
     neighbors = {}
     ids_set = set(list(ids))
@@ -408,11 +393,11 @@ def w_subset(w1, ids, silence_warnings=False):
         else:
             neighbors[i] = []
 
-    return W(neighbors, id_order=list(ids), silence_warnings=silence_warnings)
+    return W(neighbors, id_order=list(ids), **kwargs)
 
 
-def w_clip(w1, w2, outSP=True, silence_warnings=False):
-    '''
+def w_clip(w1, w2, outSP=True, **kwargs):
+    """
     Clip a continuous W object (w1) with a different W object (w2) so only cells where
     w2 has a non-zero value remain with non-zero values in w1.
 
@@ -433,20 +418,18 @@ def w_clip(w1, w2, outSP=True, silence_warnings=False):
     outSP                   : boolean
                               If True (default) return sparse version of the clipped W, if
                               False, return W object of the clipped matrix
-    silence_warnings   : boolean
-                              Switch to turn off (default on) print statements
-                              for every observation with islands
+    **kwargs                : keyword arguments
+                              optional arguments for :class:`pysal.weights.W`
 
     Returns
     -------
     wc      : W
               W, scipy.sparse.csr.csr_matrix
-              Clipped W object (sparse if outSP=Ture). It inherits
-              ``id_order`` from w1.
+              Clipped W object (sparse if outSP=Ture). It inherits ``id_order`` from w1.
 
     Examples
     --------
-    >>> from pysal.lib.weights import lat2W
+    >>> from libpysal.weights import lat2W
 
     First create a W object from a lattice using queen contiguity and
     row-standardize it (note that these weights will stay when we clip the
@@ -461,8 +444,8 @@ def w_clip(w1, w2, outSP=True, silence_warnings=False):
     to interact with each other in our weights (i.e. w_ij = 0 if i and j in
     different groups). For that, we use the following method:
 
-    >>> import pysal.lib
-    >>> w2 = pysal.lib.weights.util.block_weights(['r1', 'r2', 'r1', 'r1', 'r1', 'r2'])
+    >>> import libpysal
+    >>> w2 = libpysal.weights.block_weights(['r1', 'r2', 'r1', 'r1', 'r1', 'r2'])
 
     To illustrate that w2 will only be considered as binary even when the
     object passed is not, we can row-standardize it
@@ -473,7 +456,7 @@ def w_clip(w1, w2, outSP=True, silence_warnings=False):
     relationships that occur within one group ('r1' or 'r2') but will have
     gotten rid of those that happen across groups
 
-    >>> wcs = pysal.lib.weights.set_operations.w_clip(w1, w2, outSP=True)
+    >>> wcs = libpysal.weights.w_clip(w1, w2, outSP=True)
 
     This will create a sparse object (recommended when n is large).
 
@@ -495,10 +478,7 @@ def w_clip(w1, w2, outSP=True, silence_warnings=False):
     If we wanted an original W object, we can control that with the argument
     ``outSP``:
 
-    >>> wc = pysal.lib.weights.set_operations.w_clip(w1, w2, outSP=False)
-
-    WARNING: there are 2 disconnected observations
-    Island ids:  [1, 5]
+    >>> wc = libpysal.weights.w_clip(w1, w2, outSP=False)
     >>> wc.full()[0]
     array([[0.        , 0.        , 0.33333333, 0.33333333, 0.        ,
             0.        ],
@@ -523,9 +503,10 @@ def w_clip(w1, w2, outSP=True, silence_warnings=False):
            [ True,  True,  True,  True,  True,  True],
            [ True,  True,  True,  True,  True,  True]])
 
-    '''
+    """
 
     from .util import WSP2W
+
     if not w1.id_order:
         w1.id_order = None
     id_order = w1.id_order
@@ -537,5 +518,5 @@ def w_clip(w1, w2, outSP=True, silence_warnings=False):
     wc = w1.multiply(w2)
     wc = WSP(wc, id_order=id_order)
     if not outSP:
-        wc = WSP2W(wc, silence_warnings=silence_warnings)
+        wc = WSP2W(wc, **kwargs)
     return wc

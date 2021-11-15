@@ -2,9 +2,10 @@
 Spatial lag operations.
 """
 __author__ = "Sergio J. Rey <srey@asu.edu>, David C. Folch <david.folch@asu.edu>, Levi John Wolf <ljw2@asu.edu"
-__all__ = ['lag_spatial', 'lag_categorical']
+__all__ = ["lag_spatial", "lag_categorical"]
 
 import numpy as np
+
 
 def lag_spatial(w, y):
     """
@@ -17,7 +18,7 @@ def lag_spatial(w, y):
     ----------
 
     w                   : W
-                          pysal.lib spatial weightsobject
+                          libpysal spatial weightsobject
     y                   : array
                           numpy array with dimensionality conforming to w (see examples)
 
@@ -33,18 +34,18 @@ def lag_spatial(w, y):
     Setup a 9x9 binary spatial weights matrix and vector of data; compute the
     spatial lag of the vector.
 
-    >>> import pysal.lib
+    >>> import libpysal
     >>> import numpy as np
-    >>> w = pysal.lib.weights.lat2W(3, 3)
+    >>> w = libpysal.weights.lat2W(3, 3)
     >>> y = np.arange(9)
-    >>> yl = pysal.lib.weights.spatial_lag.lag_spatial(w, y)
+    >>> yl = libpysal.weights.lag_spatial(w, y)
     >>> yl
     array([ 4.,  6.,  6., 10., 16., 14., 10., 18., 12.])
 
     Row standardize the weights matrix and recompute the spatial lag
 
     >>> w.transform = 'r'
-    >>> yl = pysal.lib.weights.spatial_lag.lag_spatial(w, y)
+    >>> yl = libpysal.weights.lag_spatial(w, y)
     >>> yl
     array([2.        , 2.        , 3.        , 3.33333333, 4.        ,
            4.66666667, 5.        , 6.        , 6.        ])
@@ -53,7 +54,7 @@ def lag_spatial(w, y):
     Explicitly define data vector as 9x1 and recompute the spatial lag
 
     >>> y.shape = (9, 1)
-    >>> yl = pysal.lib.weights.spatial_lag.lag_spatial(w, y)
+    >>> yl = libpysal.weights.lag_spatial(w, y)
     >>> yl
     array([[2.        ],
            [2.        ],
@@ -71,7 +72,7 @@ def lag_spatial(w, y):
     >>> yr = np.arange(8, -1, -1)
     >>> yr.shape = (9, 1)
     >>> x = np.hstack((y, yr))
-    >>> yl = pysal.lib.weights.spatial_lag.lag_spatial(w, x)
+    >>> yl = libpysal.weights.lag_spatial(w, x)
     >>> yl
     array([[2.        , 6.        ],
            [2.        , 6.        ],
@@ -87,7 +88,7 @@ def lag_spatial(w, y):
     return w.sparse * y
 
 
-def lag_categorical(w, y, ties='tryself'):
+def lag_categorical(w, y, ties="tryself"):
     """
     Spatial lag operator for categorical variables.
 
@@ -127,19 +128,19 @@ def lag_categorical(w, y, ties='tryself'):
     Set up a 9x9 weights matrix describing a 3x3 regular lattice. Lag one list of
     categorical variables with no ties.
 
-    >>> import pysal.lib
+    >>> import libpysal
     >>> import numpy as np
     >>> np.random.seed(12345)
-    >>> w = pysal.lib.weights.lat2W(3, 3)
+    >>> w = libpysal.weights.lat2W(3, 3)
     >>> y = ['a','b','a','b','c','b','c','b','c']
-    >>> y_l = pysal.lib.weights.spatial_lag.lag_categorical(w, y)
+    >>> y_l = libpysal.weights.lag_categorical(w, y)
     >>> np.array_equal(y_l, np.array(['b', 'a', 'b', 'c', 'b', 'c', 'b', 'c', 'b']))
     True
 
     Explicitly reshape y into a (9x1) array and calculate lag again
 
     >>> yvect = np.array(y).reshape(9,1)
-    >>> yvect_l = pysal.lib.weights.spatial_lag.lag_categorical(w,yvect)
+    >>> yvect_l = libpysal.weights.lag_categorical(w,yvect)
     >>> check = np.array( [ [i] for i in  ['b', 'a', 'b', 'c', 'b', 'c', 'b', 'c', 'b']] )
     >>> np.array_equal(yvect_l, check)
     True
@@ -148,7 +149,7 @@ def lag_categorical(w, y, ties='tryself'):
 
     >>> y2 = ['a', 'c', 'c', 'd', 'b', 'a', 'd', 'd', 'c']
     >>> ym = np.vstack((y,y2)).T
-    >>> ym_lag = pysal.lib.weights.spatial_lag.lag_categorical(w,ym)
+    >>> ym_lag = libpysal.weights.lag_categorical(w,ym)
     >>> check = np.array([['b', 'd'], ['a', 'c'], ['b', 'c'], ['c', 'd'], ['b', 'd'], ['c', 'c'], ['b', 'd'], ['c', 'd'], ['b', 'c']])
     >>> np.array_equal(check, ym_lag)
     True
@@ -159,27 +160,28 @@ def lag_categorical(w, y, ties='tryself'):
     orig_shape = y.shape
     if len(orig_shape) > 1:
         if orig_shape[1] > 1:
-            return np.vstack([lag_categorical(w,col) for col in y.T]).T
+            return np.vstack([lag_categorical(w, col) for col in y.T]).T
     y = y.flatten()
     output = np.zeros_like(y)
     labels = np.unique(y)
     normalized_labels = np.zeros(y.shape, dtype=np.int)
-    for i,label in enumerate(labels):
-       normalized_labels[y == label] = i
-    for focal_name,neighbors in w:
+    for i, label in enumerate(labels):
+        normalized_labels[y == label] = i
+    for focal_name, neighbors in w:
         focal_idx = w.id2i[focal_name]
         neighborhood_tally = np.zeros(labels.shape)
         for neighb_name, weight in list(neighbors.items()):
             neighb_idx = w.id2i[neighb_name]
             neighb_label = normalized_labels[neighb_idx]
             neighborhood_tally[neighb_label] += weight
-        out_label_idx = _resolve_ties(focal_idx, normalized_labels,
-                               neighborhood_tally, neighbors, ties, w)
+        out_label_idx = _resolve_ties(
+            focal_idx, normalized_labels, neighborhood_tally, neighbors, ties, w
+        )
         output[focal_idx] = labels[out_label_idx]
     return output.reshape(orig_shape)
 
 
-def _resolve_ties(idx,normalized_labels,tally,neighbors,method,w):
+def _resolve_ties(idx, normalized_labels, tally, neighbors, method, w):
     """
     Helper function to resolve ties if lag is multimodal
 
@@ -192,8 +194,8 @@ def _resolve_ties(idx,normalized_labels,tally,neighbors,method,w):
     an attempt to break the tie, but if it fails, a random tiebreaker will be
     selected.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     idx                 : int
                           index (aligned with `normalized_labels`) of the 
                           current observation being resolved.
@@ -220,18 +222,20 @@ def _resolve_ties(idx,normalized_labels,tally,neighbors,method,w):
     -------
     integer denoting which label to use to label the observation.
     """
-    ties, = np.where(tally == tally.max()) #returns a tuple for flat arrays
-    if len(tally[tally==tally.max()]) <= 1: #no tie, pick the highest
+    (ties,) = np.where(tally == tally.max())  # returns a tuple for flat arrays
+    if len(tally[tally == tally.max()]) <= 1:  # no tie, pick the highest
         return np.argmax(tally).astype(int)
-    elif method.lower() == 'random': #choose randomly from tally
+    elif method.lower() == "random":  # choose randomly from tally
         return np.random.choice(np.squeeze(ties)).astype(int)
-    elif method.lower() == 'lowest': # pick lowest tied value
+    elif method.lower() == "lowest":  # pick lowest tied value
         return ties[0].astype(int)
-    elif method.lower() == 'highest': #pick highest tied value
+    elif method.lower() == "highest":  # pick highest tied value
         return ties[-1].astype(int)
-    elif method.lower() == 'tryself': # add self-label as observation, try again, random if fail
+    elif (
+        method.lower() == "tryself"
+    ):  # add self-label as observation, try again, random if fail
         mean_neighbor_value = np.mean(list(neighbors.values()))
         tally[normalized_labels[idx]] += mean_neighbor_value
-        return _resolve_ties(idx,normalized_labels,tally,neighbors,'random', w)
+        return _resolve_ties(idx, normalized_labels, tally, neighbors, "random", w)
     else:
-        raise KeyError('Tie-breaking method for categorical lag not recognized')
+        raise KeyError("Tie-breaking method for categorical lag not recognized")

@@ -8,8 +8,15 @@ __author__ = "Luc Anselin <luc.anselin@asu.edu> Serge Rey <sjsrey@gmail.com>"
 import numpy as np
 from ...lib.weights.spatial_lag import lag_spatial
 from .tabular import _univariate_handler
+import warnings
+from .crand import (
+    crand as _crand_plus,
+    njit as _njit,
+    _prepare_univariate,
+    _prepare_bivariate,
+)
 
-__all__ = ['Gamma']
+__all__ = ["Gamma"]
 
 PERMUTATIONS = 999
 
@@ -31,10 +38,10 @@ class Gamma(object):
                       'c' cross product
                       's' squared difference
                       'a' absolute difference
-    standardize     : {'no', 'yes'}
+    standardize     : {False, True}
                       standardize variables first
-                      'no' keep as is
-                      'yes' or 'y' standardize to mean zero and variance one
+                      False, keep as is
+                      True, standardize to mean zero and variance one
     permutations    : int
                       number of random permutations for calculation of pseudo-p_values
 
@@ -47,7 +54,7 @@ class Gamma(object):
     op           : {'c', 's', 'a'}
                    attribute similarity function, as per parameters
                    attribute similarity function
-    stand        : {'no', 'yes'}
+    stand        : {False, True}
                    standardization
     permutations : int
                    number of permutations
@@ -75,9 +82,9 @@ class Gamma(object):
 
     use same example as for join counts to show similarity
 
-    >>> import pysal.lib, numpy as np
-    >>> from pysal.explore.esda.gamma import Gamma
-    >>> w = pysal.lib.weights.lat2W(4,4)
+    >>> import libpysal, numpy as np
+    >>> from esda.gamma import Gamma
+    >>> w = libpysal.weights.lat2W(4,4)
     >>> y=np.ones(16)
     >>> y[0:8]=0
     >>> np.random.seed(12345)
@@ -123,7 +130,7 @@ class Gamma(object):
     >>> g2.mean_g
     25.623623623623622
     >>> np.random.seed(12345)
-    >>> g3 = Gamma(y,w,standardize='y')
+    >>> g3 = Gamma(y,w,standardize=True)
     >>> g3.g
     32.0
     >>> round(g3.g_z, 3)
@@ -157,14 +164,23 @@ class Gamma(object):
 
 
     """
-    def __init__(self, y, w, operation='c', standardize='no', permutations=PERMUTATIONS):
+
+    def __init__(
+        self, y, w, operation="c", standardize=False, permutations=PERMUTATIONS
+    ):
+        if isinstance(standardize, str):
+            standardize = standardize.lower() == "yes"
+            warnings.warn(
+                "Use True/False for standardize. The option to"
+                ' provide "yes"/"no" will be deprecated in PySAL 2.2.'
+            )
         y = np.asarray(y).flatten()
         self.w = w
         self.y = y
         self.op = operation
-        self.stand = standardize.lower()
+        self.stand = standardize
         self.permutations = permutations
-        if self.stand == 'yes' or self.stand == 'y':
+        if self.stand:
             ym = np.mean(self.y)
             ysd = np.std(self.y)
             ys = (self.y - ym) / ysd
@@ -172,8 +188,10 @@ class Gamma(object):
         self.g = self.__calc(self.y, self.op)
 
         if permutations:
-            sim = [self.__calc(np.random.permutation(self.y), self.op)
-                   for i in range(permutations)]
+            sim = [
+                self.__calc(np.random.permutation(self.y), self.op)
+                for i in range(permutations)
+            ]
             self.sim_g = np.array(sim)
             self.min_g = np.min(self.sim_g)
             self.mean_g = np.mean(self.sim_g)
@@ -187,25 +205,26 @@ class Gamma(object):
         return self.g
 
     @property
-    def  p_sim(self):
+    def p_sim(self):
         """new name to fit with Moran module"""
         return self.p_sim_g
 
     def __calc(self, z, op):
-        if op == 'c':     # cross-product
+        if op == "c":  # cross-product
             zl = lag_spatial(self.w, z)
             g = (z * zl).sum()
-        elif op == 's':   # squared difference
+        elif op == "s":  # squared difference
             zs = np.zeros(z.shape)
             z2 = z ** 2
             for i, i0 in enumerate(self.w.id_order):
                 neighbors = self.w.neighbor_offsets[i0]
                 wijs = self.w.weights[i0]
                 zw = list(zip(neighbors, wijs))
-                zs[i] = sum([wij * (z2[i] - 2.0 * z[i] * z[
-                    j] + z2[j]) for j, wij in zw])
+                zs[i] = sum(
+                    [wij * (z2[i] - 2.0 * z[i] * z[j] + z2[j]) for j, wij in zw]
+                )
             g = zs.sum()
-        elif op == 'a':    # absolute difference
+        elif op == "a":  # absolute difference
             zs = np.zeros(z.shape)
             for i, i0 in enumerate(self.w.id_order):
                 neighbors = self.w.neighbor_offsets[i0]
@@ -213,7 +232,7 @@ class Gamma(object):
                 zw = list(zip(neighbors, wijs))
                 zs[i] = sum([wij * abs(z[i] - z[j]) for j, wij in zw])
             g = zs.sum()
-        else:              # any previously defined function op
+        else:  # any previously defined function op
             zs = np.zeros(z.shape)
             for i, i0 in enumerate(self.w.id_order):
                 neighbors = self.w.neighbor_offsets[i0]
@@ -226,12 +245,32 @@ class Gamma(object):
     def __pseudop(self, sim, g):
         above = sim >= g
         larger = above.sum()
-        psim = (larger + 1.) / (self.permutations + 1.)
+        psim = (larger + 1.0) / (self.permutations + 1.0)
         if psim > 0.5:
-            psim = (self.permutations - larger + 1.) / (self.permutations + 1.)
+            psim = (self.permutations - larger + 1.0) / (self.permutations + 1.0)
         return psim
 
     @classmethod
-    def by_col(cls, df, cols, w=None, inplace=False, pvalue = 'sim', outvals = None, **stat_kws):
-        return _univariate_handler(df, cols, w=w, inplace=inplace, pvalue=pvalue,
-                outvals=outvals, stat=cls, swapname=cls.__name__.lower(), **stat_kws)
+    def by_col(
+        cls, df, cols, w=None, inplace=False, pvalue="sim", outvals=None, **stat_kws
+    ):
+        return _univariate_handler(
+            df,
+            cols,
+            w=w,
+            inplace=inplace,
+            pvalue=pvalue,
+            outvals=outvals,
+            stat=cls,
+            swapname=cls.__name__.lower(),
+            **stat_kws
+        )
+
+
+# --------------------------------------------------------------
+# Conditional Randomization Function Implementations
+# --------------------------------------------------------------
+@_njit(fastmath=True)
+def _local_gamma_crand(i, z, permuted_ids, weights_i, scaling):
+    zi, zrand = _prepare_univariate(i, z, permuted_ids, weights_i)
+    return (zi * zrand) @ weights_i * scaling

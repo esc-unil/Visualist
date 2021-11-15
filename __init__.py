@@ -25,15 +25,14 @@
 __author__ = 'Quentin Rossy'
 __date__ = '2019-04-15'
 __copyright__ = '(C) 2019 by Quentin Rossy'
-from .visualist_main import VisualistPlugin
 
-# noinspection PyPep8Naming
-def classFactory(iface):  # pylint: disable=invalid-name
+
+def classFactory(iface):
     """Load Visualist class from file Visualist.
 
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
-    #
-
+    
+    from .visualist_main import VisualistPlugin
     return VisualistPlugin(iface)

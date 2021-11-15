@@ -42,18 +42,25 @@ from qgis.core import (
                 QgsProcessingException,
                 QgsProcessing,
                 QgsField,
+                QgsProject,
                 QgsFeatureSink,
                 QgsVectorFileWriter,
                 QgsFeature,
                 QgsFeatureRequest,
                 QgsProcessingUtils,
                 QgsProcessingParameterEnum,
-                QgsProcessingParameterNumber
+                QgsProcessingParameterNumber,
+                QgsMessageLog,
+                QgsWkbTypes
                 )
 
 
 from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
+
+#Convenient function to debug
+NAME = "Visualist"
+log = lambda m: QgsMessageLog.logMessage(m, NAME)
 
 class LocalIndicatorSpatialA(VisualistAlgorithm):
     dest_id = None  # Save a reference to the output layer id
@@ -155,11 +162,15 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
 
         #Save in a temporary shp and laod with pysal
         temp_file = os.path.join(tempfile.gettempdir(), 'local_moran.shp')
-        writerError = QgsVectorFileWriter.writeAsVectorFormat(layer=poly_source,
+        log(temp_file)
+        opt = QgsVectorFileWriter.SaveVectorOptions()
+        opt.driverName = 'ESRI Shapefile'
+        opt.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+        opt.overrideGeometryType = QgsWkbTypes.Polygon
+        writerError = QgsVectorFileWriter.writeAsVectorFormatV3(layer=poly_source,
                             fileName=temp_file,
-                            fileEncoding=sys.getfilesystemencoding(),
-                            destCRS = poly_source.crs(),
-                            driverName = "ESRI Shapefile")
+                            transformContext=QgsProject.instance().transformContext(),
+                            options=opt)
         if writerError[0] != 0:
             feedback.pushInfo('Temp file writting error: {}'.format(writerError[1]))
         # Get data from field
@@ -174,7 +185,7 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
         y = numpy.array(values)
 
         if proximity == 0: # queen
-            w = pysal.lib.weights.contiguity.Queen.from_shapefile(temp_file)
+            w = pysal.lib.weights.contiguity.Queen.from_shapefile(temp_file) #, idVariable='fid'
         elif proximity == 1: # 1 for rook
             w = pysal.lib.weights.contiguity.Rook.from_shapefile(temp_file)
         elif proximity == 2: # 2 for bishop
