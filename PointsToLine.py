@@ -118,7 +118,7 @@ class PointsToLine(VisualistAlgorithm):
         self.addParameter(count_field)
 
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_LINE,
-                                                    self.tr('Graduated Line Map'), QgsProcessing.TypeVectorLine))
+                                                    self.tr('Graduated Lines Map'), QgsProcessing.TypeVectorLine))
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_POINT,
                                                     self.tr('Points linked to Line Map'), QgsProcessing.TypeVectorPoint))
 

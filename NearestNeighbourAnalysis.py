@@ -103,7 +103,7 @@ class NearestNeighbourAnalysis(VisualistAlgorithm):
                                                self.tr('Area of the analysis (A)'),
                                                optional=True))
 
-        self.addParameter(QgsProcessingParameterFileDestination(self.OUTPUT_HTML_FILE, self.tr('K-Nearest neighbours analysis'), self.tr('HTML files (*.html)'), None, True))
+        self.addParameter(QgsProcessingParameterFileDestination(self.OUTPUT_HTML_FILE, self.tr('Nearest Neighbour Analysis'), self.tr('HTML files (*.html)'), None, True))
 
     def postProcessAlgorithm(self, context, feedback):
         """

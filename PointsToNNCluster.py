@@ -79,7 +79,7 @@ class PointsToNNCluster(VisualistAlgorithm):
                                             defaultValue=10))
 
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT,
-                                            self.tr('Near Neighbours Clusters Map'), QgsProcessing.TypeVectorLine))
+                                            self.tr('Nearest Neighbours Clusters Map'), QgsProcessing.TypeVectorLine))
 
     def postProcessAlgorithm(self, context, feedback):
         """

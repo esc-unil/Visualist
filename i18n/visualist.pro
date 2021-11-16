@@ -1,6 +1,22 @@
 SOURCES   		= ../visualist_provider.py \
 				../visualist_main.py \
 				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../visualist_main.py \
+				../TimeFormater.py \
+				../PointsToEdge.py \
+				../MeetingPoints.py \
+				../EdgesToFlow.py \
+				../DistanceAnalysis.py \
 				../PointsToSplitLine.py \
 				../PointsToProportional.py \
 				../PointsToNNCluster.py \
@@ -8,10 +24,8 @@ SOURCES   		= ../visualist_provider.py \
 				../PointsInPolygon.py \
 				../PointsInGrid.py \
 				../NearestNeighbourAnalysis.py \
-				../loadSpreadsheet.py \
-				../loadMaps.py \
-				../lisa.py \
-				../utils/SpreadsheetLayersDialog.py \
+				../Lisa.py \
+				../utils/renderers.py \
 
 TRANSLATIONS   	+= visualist_fr.ts
 TRANSLATIONS   	+= visualist_en.ts

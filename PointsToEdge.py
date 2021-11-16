@@ -91,10 +91,10 @@ class PointsToEdge(VisualistAlgorithm):
                                                       parentLayerParameterName=self.INPUT,
                                                       allowMultiple=True, optional=True))
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_LINE,
-                                                        self.tr('Edges'),
+                                                        self.tr('Edge Map'),
                                                         QgsProcessing.TypeVectorLine))
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT_POINT,
-                                                        self.tr('End points'),
+                                                        self.tr('End points Map'),
                                                         QgsProcessing.TypeVectorPoint))
 
     def addFields(self, source, fields, prefix, field_names, order_field_def=None):
