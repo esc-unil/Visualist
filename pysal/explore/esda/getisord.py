@@ -389,7 +389,7 @@ class G_Local(object):
         permutations=PERMUTATIONS,
         star=False,
         keep_simulations=True,
-        n_jobs=-1,
+        n_jobs=1,
         seed=None,
     ):
         y = np.asarray(y).flatten()

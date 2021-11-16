@@ -44,7 +44,7 @@ nearestneighboursmap:
   helpUrl:      '#nearest-neighbours-clusters-map'
   description:  >
     The map shows the hotspots identified by the analysis of the closest neighbours.
-    This algorithm is a simplified version of Ned Levine’s algorithm in CrimeStat.
+    This algorithm is a simplified version of the algorithm in CrimeStat from Ned Levine.
 proportionalsymbolsmap:
   displayName:  Proportional Symbols Map
   icon:         proportional.png

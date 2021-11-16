@@ -117,25 +117,15 @@ class PointsToSplitLine(VisualistAlgorithm):
         outputs = {}
 
         # v.split
-        temporary_path = os.path.join(gettempdir(), 'segmented_layer.gpkg')
-        try:    #valid since 3.6
-            # Division des lignes par longueur maximale
-            alg_params = {
-                'INPUT': parameters[self.LINES],
-                'LENGTH': parameters[self.SEGMENT_SIZE],
-                'OUTPUT': temporary_path
-            }
-            output = processing.run('native:splitlinesbylength', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            outputs['segmentedLayer'] = output['OUTPUT']
-        except: #valid for 3.4-ltr + Grass
-            # Division des lignes par longueur maximale
-            alg_params = {
-                'INPUT': parameters[self.LINES],
-                'DISTANCE': parameters[self.SEGMENT_SIZE],
-                'OUTPUT': temporary_path
-            }
-            output = processing.run('native:segmentizebymaxdistance', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            outputs['segmentedLayer'] = output['OUTPUT']
+        # temporary_path = os.path.join(gettempdir(), 'segmented_layer2.gpkg')
+        # Division des lignes par longueur maximale
+        alg_params = {
+            'INPUT': parameters[self.LINES],
+            'LENGTH': parameters[self.SEGMENT_SIZE],
+            'OUTPUT': 'TEMPORARY_OUTPUT'
+        }
+        output = processing.run('native:splitlinesbylength', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['segmentedLayer'] = output['OUTPUT']
 
         feedback.setCurrentStep(1)
         if feedback.isCanceled():

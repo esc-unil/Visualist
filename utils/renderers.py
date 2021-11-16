@@ -97,40 +97,43 @@ class MapRender(object):
 
     def choropleth(self, cntField, classes=7, labelField=None, mode=QgsGraduatedSymbolRenderer.Jenks):
         labelField = cntField if labelField is None else labelField
+
         props = {}
         props["outline_color"] ="255,255,255,255"
         props["outline_style"] ="solid"
         props["outline_width"] ="0.26"
         props["outline_width_unit"] ="MM"
-        symbol = QgsFillSymbol.createSimple(props)
-#        ramp = QgsGradientColorRamp(color1=Qt.white, color2=Qt.black)
-        ramp = QgsGradientColorRamp(QColor(230,230,230), QColor(50,50,50))
-        myRenderer = QgsGraduatedSymbolRenderer.createRenderer(self.l,
-                                                    cntField,
-                                                    classes,
-                                                    mode,
-                                                    symbol,
-                                                    ramp)
+
+        renderer = QgsGraduatedSymbolRenderer()
+        renderer.setSourceSymbol(QgsFillSymbol.createSimple(props))
+        renderer.setClassAttribute(cntField)
+        renderer.setClassificationMethod(QgsClassificationJenks())
+        renderer.setSourceColorRamp(QgsGradientColorRamp(QColor(230,230,230), QColor(50,50,50)))
+        renderer.setGraduatedMethod(QgsGraduatedSymbolRenderer.GraduatedColor)
+        renderer.updateClasses(self.l, classes)
+
         self.setLabels(labelField, filter=0)
-        self.l.setRenderer(myRenderer)
-        return myRenderer
+        self.l.setRenderer(renderer)
+
+        return renderer
 
     def nnclusters(self, cntField, classes=7, labelField=None, mode=QgsGraduatedSymbolRenderer.Jenks):
         labelField = cntField if labelField is None else labelField
+
         props = {}
         props["outline_color"] ="0,0,0,0"
         props["outline_style"] ="solid"
         props["outline_width"] ="2"
         props["outline_width_unit"] ="MM"
-        symbol = QgsFillSymbol.createSimple(props)
-    #        ramp = QgsGradientColorRamp(color1=Qt.white, color2=Qt.black)
-        ramp = QgsGradientColorRamp(QColor(230,230,230), QColor(50,50,50))
-        myRenderer = QgsGraduatedSymbolRenderer.createRenderer(self.l,
-                                                    cntField,
-                                                    classes,
-                                                    mode,
-                                                    symbol,
-                                                    ramp)
+
+        renderer = QgsGraduatedSymbolRenderer()
+        renderer.setSourceSymbol(QgsFillSymbol.createSimple(props))
+        renderer.setClassAttribute(cntField)
+        renderer.setClassificationMethod(QgsClassificationJenks())
+        renderer.setSourceColorRamp(QgsGradientColorRamp(QColor(230,230,230), QColor(50,50,50)))
+        renderer.setGraduatedMethod(QgsGraduatedSymbolRenderer.GraduatedColor)
+        renderer.updateClasses(self.l, classes)
+
         self.setLabels(labelField, filter=0)
         self.l.setRenderer(myRenderer)
         return myRenderer
@@ -201,7 +204,7 @@ class MapRender(object):
             myRange1 = QgsRendererRange(myMin,myMax,mySymbol,myLabel)
             myRangeList.append(myRange1)
         myRenderer = QgsGraduatedSymbolRenderer('', myRangeList)
-        myRenderer.setMode(QgsGraduatedSymbolRenderer.EqualInterval)
+        myRenderer.setClassificationMethod(QgsClassificationEqualInterval())
         myRenderer.setClassAttribute(cntField)
         self.l.setRenderer(myRenderer)
         return myRenderer

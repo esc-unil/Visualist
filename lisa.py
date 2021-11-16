@@ -31,7 +31,7 @@ __copyright__ = '(C) 2019 by Quentin Rossy'
 __revision__ = '$Format:%H$'
 
 import os, tempfile, sys
-from visualist import pysal
+from . import pysal
 import numpy
 
 from qgis.PyQt.QtCore import QVariant
@@ -73,7 +73,7 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
     OUTPUT = 'OUTPUT'
 
     LISA_TYPE = {0:'Moran\'s I',1:'Getis-Ord Gi*'}
-    W_TYPE = {0:'Queen', 1:'Rook', 2:'Bishop', 3:'Distance', 4:'Nearest neighbours'}
+    W_TYPE = {0:'Queen', 1:'Rook', 2:'Bishop', 3:'Nearest neighbours'} #3:'Distance',
 
     def __init__(self):
         super().__init__()
@@ -102,7 +102,7 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
                                     allowMultiple=False, defaultValue=0))
 
         self.addParameter(QgsProcessingParameterNumber(self.DISTANCE,
-                                    self.tr('Distance (in layer unit or number of neighbours)'),
+                                    self.tr('Number of neighbours'),
                                     type=QgsProcessingParameterNumber.Integer,
                                     optional=True))
 
@@ -161,8 +161,7 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
 
 
         #Save in a temporary shp and laod with pysal
-        temp_file = os.path.join(tempfile.gettempdir(), 'local_moran.shp')
-        log(temp_file)
+        temp_file = os.path.join(tempfile.gettempdir(), 'lisa.shp')
         opt = QgsVectorFileWriter.SaveVectorOptions()
         opt.driverName = 'ESRI Shapefile'
         opt.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
@@ -191,11 +190,13 @@ class LocalIndicatorSpatialA(VisualistAlgorithm):
         elif proximity == 2: # 2 for bishop
             wq = pysal.lib.weights.contiguity.Queen.from_shapefile(temp_file)
             wr = pysal.lib.weights.contiguity.Rook.from_shapefile(temp_file)
-            w = pysal.lib.weights.set_operations.w_difference(wq, wr,constrained = False)
-        elif proximity == 3: # 2 for distance bnd
-            w = pysal.lib.weights.distance.DistanceBand.from_shapefile(temp_file, threshold=distance)
-        elif proximity == 4: # 2 for NN
+            #feedback.pushInfo('W-Queen matrix size: {}'.format(wq.sparse.shape))
+            #feedback.pushInfo('W-Rook matrix size: {}'.format(wr.sparse.shape))
+            w = pysal.lib.weights.set_operations.w_difference(wq, wr, constrained=False, silence_warnings=True)
+        elif proximity == 3: # 2 for NN
             w = pysal.lib.weights.distance.KNN.from_shapefile(temp_file, k=distance)
+        #elif proximity == 3: # 2 for distance bnd
+        #    w = pysal.lib.weights.distance.DistanceBand.from_shapefile(temp_file, threshold=distance)
 
         feedback.pushInfo('W matrix size: {}'.format(w.sparse.shape))
         if len(values) != w.sparse.shape[0]:

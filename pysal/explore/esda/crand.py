@@ -34,7 +34,7 @@ __all__ = ["crand"]
 #######################################################################
 
 
-@njit(fastmath=True)
+#@njit(fastmath=True)
 def vec_permutations(max_card: int, n: int, k_replications: int, seed: int):
     """
     Generate `max_card` permuted IDs, sampled from `n` without replacement,
@@ -62,6 +62,7 @@ def vec_permutations(max_card: int, n: int, k_replications: int, seed: int):
     for k in prange(k_replications):
         result[k] = np.random.choice(n - 1, size=max_card, replace=False)
     return result
+
 
 
 def crand(

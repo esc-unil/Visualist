@@ -115,9 +115,9 @@ class PointsInGrid(VisualistAlgorithm):
                 self.tr('Grid size is too large for the covered area'))
 
         rand_dist = self.randDist(point_source)
-        feedback.pushDebugInfo(self.tr('Expected mean distance between points is: {}'.format(rand_dist)))
+        feedback.pushWarning(self.tr('Expected mean distance between points if the distribution was random: {}'.format(rand_dist)))
         if grid_size < rand_dist:
-            feedback.pushDebugInfo(self.tr('You should consider to increase the size of the cell'))
+            feedback.pushWarning(self.tr('You should consider to increase the size of the cell'))
 
         field_name = self.parameterAsString(parameters, self.FIELD, context)
         self.field_name = field_name
@@ -134,7 +134,7 @@ class PointsInGrid(VisualistAlgorithm):
 
         index = QgsSpatialIndex()
         for feat in point_source.getFeatures():
-            index.insertFeature(feat)
+            index.addFeature(feat)
 
         current = 0
         total = 100.0/((bbox.width()/grid_size)*(bbox.height()/grid_size))

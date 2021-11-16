@@ -100,15 +100,15 @@ class PointsToNNCluster(VisualistAlgorithm):
         self.layer = point_source
         self.index = QgsSpatialIndex()
         for feat in point_source.getFeatures():
-            self.index.insertFeature(feat)
+            self.index.addFeature(feat)
 
         self.d = self.parameterAsDouble(parameters, self.DIST, context)
         self.thresh = self.parameterAsDouble(parameters, self.COUNT, context)
 
         rand_dist = self.randDist(point_source)
-        feedback.pushDebugInfo(self.tr('Expected mean distance between points is: {}'.format(rand_dist)))
+        feedback.pushWarning(self.tr('Expected mean distance between points if the distribution was random: {}'.format(rand_dist)))
         if self.d < rand_dist:
-            feedback.pushDebugInfo(self.tr('You should consider to increase the distance between points parameter'))
+            feedback.pushWarning(self.tr('You should consider to increase the distance between points parameter'))
 
 
         fields = QgsFields()
