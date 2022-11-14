@@ -50,7 +50,7 @@ from qgis.core import (QgsField,
                        QgsProcessingUtils
                       )
 
-from .edgebundlingUtils import Edge, EdgeCluster
+from .utils.edgebundlingUtils import Edge, EdgeCluster
 from .visualist_alg import VisualistAlgorithm
 from .utils import renderers
 

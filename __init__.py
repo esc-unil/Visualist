@@ -23,8 +23,8 @@
 """
 
 __author__ = 'Quentin Rossy'
-__date__ = '2019-04-15'
-__copyright__ = '(C) 2019 by Quentin Rossy'
+__date__ = '2022-11-14'
+__copyright__ = '(C) 2022 by Quentin Rossy'
 
 
 def classFactory(iface):

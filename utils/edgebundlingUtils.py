@@ -34,8 +34,6 @@ from qgis.core import QgsFeature, QgsPoint, QgsVector, QgsGeometry, QgsField, Qg
 import processing
 
 from qgis.core import QgsMessageLog, QgsProcessingFeedback
-from processing.core.ProcessingLog import ProcessingLog
-from processing.core.ProcessingConfig import ProcessingConfig
 
 #Convenient function to debug
 NAME = "Visualist"
