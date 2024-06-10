@@ -82,7 +82,7 @@ class MapRender(object):
 
     def prop(self, cntField, labelField=None, type=POINT, color=Qt.black, trans=0.7):
         labelField = cntField if labelField is None else labelField
-        s = QgsSymbol.defaultSymbol(1) if type == LINE else QgsSymbol.defaultSymbol(0)
+        s = QgsSymbol.defaultSymbol(QgsWkbTypes.LineGeometry) if type == LINE else QgsSymbol.defaultSymbol(QgsWkbTypes.PointGeometry)
         myRenderer = QgsSingleSymbolRenderer(s)
         self.setDataDefinedSize(s, cntField, type)
         myRenderer.symbol().setColor(color)
